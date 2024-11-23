@@ -1,15 +1,3 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { signIn, signOut, useSession } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,42 +8,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, Settings, User } from "lucide-react";
-import { FaGoogle } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
+import { signOut, useSession } from "next-auth/react";
 
-const UserButton = () => {
-  const { data: session, status } = useSession();
-
-  if (status === "loading") {
-    return (
-      <Button variant="ghost" className="w-8 h-8 rounded-full animate-pulse" />
-    );
-  }
-
-  if (status === "unauthenticated") {
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button>Login</Button>
-        </DialogTrigger>
-        <DialogContent
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          className="w-[95%] sm:w-425px rounded-lg"
-        >
-          <DialogHeader>
-            <DialogTitle>Login</DialogTitle>
-            <DialogDescription>
-              Start login to use our application
-            </DialogDescription>
-            <div className="w-full flex flex-col gap-4">
-              <Button onClick={() => signIn("google")} leftIcon={<FaGoogle />}>
-                Login with Google
-              </Button>
-            </div>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+const UserMenu = () => {
+  const { data: session } = useSession();
 
   return (
     <DropdownMenu>
@@ -106,4 +63,4 @@ const UserButton = () => {
   );
 };
 
-export default UserButton;
+export default UserMenu;

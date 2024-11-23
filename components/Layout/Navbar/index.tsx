@@ -1,6 +1,6 @@
 import MainNav from ".//main-nav";
 import MobileNav from "./mobile-nav";
-import LoginButton from "@/components/features/Auth/LoginButton";
+import LoginButton from "@/components/features/Auth";
 import { navItems } from "./constant";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 

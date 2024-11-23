@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
 
 export function ThemeToggle() {
   const { setTheme } = useTheme();

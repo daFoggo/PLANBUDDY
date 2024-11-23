@@ -7,12 +7,13 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { IMainNavProps } from "@/types/navbar";
+import Logo from "../Logo";
 
 const MainNav = ({ items }: IMainNavProps) => {
   return (
     <div className="mr-4 hidden md:flex">
       <Link href="/" className="mr-6 flex items-center space-x-2">
-        <span className="hidden sm:inline-block text-2xl font-clash font-semibold">Let's Meat</span>
+        <Logo />
       </Link>
       <NavigationMenu>
         <NavigationMenuList>
@@ -29,6 +30,6 @@ const MainNav = ({ items }: IMainNavProps) => {
       </NavigationMenu>
     </div>
   );
-}
+};
 
 export default MainNav;

@@ -4,20 +4,12 @@ import Link from "next/link";
 
 const MobileLink = ({
   href,
-  onOpenChange,
   className,
   children,
   ...props
 }: IMobileLinkProps) => {
   return (
-    <Link
-      href={href}
-      onClick={() => {
-        onOpenChange?.(false);
-      }}
-      className={cn(className)}
-      {...props}
-    >
+    <Link href={href} className={cn(className)} {...props}>
       {children}
     </Link>
   );

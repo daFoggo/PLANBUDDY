@@ -7,7 +7,6 @@ export interface IMobileNavProps {
 }
 
 interface IMobileLinkProps extends React.ComponentPropsWithoutRef<"a"> {
-  onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
   href: string;
 }

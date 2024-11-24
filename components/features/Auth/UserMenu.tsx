@@ -1,3 +1,5 @@
+import { signOut, useSession } from "next-auth/react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +11,6 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { signOut, useSession } from "next-auth/react";
 
 const UserMenu = () => {
   const { data: session } = useSession();

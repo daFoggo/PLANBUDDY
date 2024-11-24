@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ParticipantRole {
+  OWNER
+  PARTICIPANT
+}
+
+enum ResponseStatus {
+  PENDING 
+  ACCEPTED
+  DECLINED
+  TENTATIVE
+}
+
+enum MeetingStatus {
+  DRAFT
+  SCHEDULED 
+  CANCELLED
+  COMPLETED
+}
+
+
+model User {
+  id         Int   @id @default(autoincrement())
+  email      String   @unique
+  name       String
+  profilePic String
+  timeZone   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations (1:n)
+  participations MeetingParticipant[]
+}
+
+model Meeting {
+  id          Int   @id @default(autoincrement())
+  title       String
+  description String?
+  location    String?
+  note        String?
+  startTime   DateTime
+  endTime     DateTime
+  status      Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations (1:n)
+  participants   MeetingParticipant[]
+  dateSelections MeetingDateSelection[]
+}
+
+model MeetingParticipant {
+  id             Int   @id @default(autoincrement())
+  role           String // owner/participant
+  responseStatus String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations (n:1)
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+
+  meetingId Int
+  meeting   Meeting @relation(fields: [meetingId], references: [id])
+
+  // Relations (1:n)
+  availabilities AvailableFor[]
+
+  @@unique([userId, meetingId])
+  @@index([userId])
+  @@index([meetingId])
+}
+
+model MeetingDate {
+  id        Int   @id @default(autoincrement())
+  date      DateTime @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations (1:n)
+  selections MeetingDateSelection[]
+}
+
+model MeetingDateSelection {
+  id        Int   @id @default(autoincrement())
+  isFinal   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations (n:1)
+  meetingId Int
+  meeting   Meeting @relation(fields: [meetingId], references: [id])
+
+  dateId Int
+  date   MeetingDate @relation(fields: [dateId], references: [id])
+
+  // Relations (1:n)
+  availabilities AvailableFor[]
+
+  @@unique([meetingId, dateId])
+  @@index([meetingId])
+  @@index([dateId])
+}
+
+model AvailableFor {
+  id            Int   @id @default(autoincrement())
+  availableFrom DateTime
+  availableTo   DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations (n:1)
+  participantId Int
+  participant   MeetingParticipant @relation(fields: [participantId], references: [id])
+
+  dateSelectionId Int
+  dateSelection   MeetingDateSelection @relation(fields: [dateSelectionId], references: [id])
+
+  @@unique([participantId, dateSelectionId])
+  @@index([participantId])
+  @@index([dateSelectionId])
+}

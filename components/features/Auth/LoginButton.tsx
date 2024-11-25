@@ -36,7 +36,7 @@ const LoginButton = () => {
           className="w-[95%] sm:w-[425px] rounded-lg"
         >
           <DialogHeader>
-            <DialogTitle>Login</DialogTitle>
+            <DialogTitle className="text-xl">Login</DialogTitle>
             <DialogDescription>
               Start login to use our application
             </DialogDescription>

@@ -9,8 +9,8 @@ import { SessionProvider } from "next-auth/react";
 import Footer from "@/components/Layout/Footer";
 
 export const metadata: Metadata = {
-  title: "My Next.js App",
-  description: "A beautiful and responsive Next.js application",
+  title: "1MIN2MEET",
+  description: "Fast meeting scheduler in 1 minute",
 };
 
 const inter = Inter({

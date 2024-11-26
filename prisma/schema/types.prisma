@@ -1,0 +1,23 @@
+enum UserType {
+  GOOGLE_USER
+  GUEST
+}
+
+enum ParticipantRole {
+  OWNER
+  PARTICIPANT
+}
+
+enum ResponseStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  TENTATIVE
+}
+
+enum MeetingStatus {
+  PUBLISHED
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+}

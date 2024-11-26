@@ -1,0 +1,69 @@
+model Meeting {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  location    String?
+  note        String?
+  startTime   DateTime
+  endTime     DateTime
+  status      String   @default("PUBLISHED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations (1:n)
+  participants   MeetingParticipant[]
+  dateSelections MeetingDateSelection[]
+}
+
+model MeetingParticipant {
+  id             String   @id @default(cuid())
+  role           String // owner/participant
+  responseStatus String   @default("PENDING")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations (n:1)
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  meetingId String
+  meeting   Meeting @relation(fields: [meetingId], references: [id])
+
+  // Relations (1:n)
+  availabilities AvailableFor[]
+
+  @@unique([userId, meetingId])
+  @@index([userId])
+  @@index([meetingId])
+}
+
+model MeetingDate {
+  id        String   @id @default(cuid())
+  date      DateTime @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations (1:n)
+  selections MeetingDateSelection[]
+}
+
+model MeetingDateSelection {
+  id        String   @id @default(cuid())
+  isFinal   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations (n:1)
+  meetingId String
+  meeting   Meeting @relation(fields: [meetingId], references: [id])
+
+  dateId String
+  date   MeetingDate @relation(fields: [dateId], references: [id])
+
+  // Relations (1:n)
+  availabilities AvailableFor[]
+
+  @@unique([meetingId, dateId])
+  @@index([meetingId])
+  @@index([dateId])
+}

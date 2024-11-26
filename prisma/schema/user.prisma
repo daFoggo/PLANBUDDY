@@ -1,0 +1,19 @@
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  name          String
+  image         String?
+  emailVerified DateTime?
+  timeZone      String?
+  userType      UserType  @default(GUEST)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  // Relations (1:n)
+  participations MeetingParticipant[]
+
+  @@index([email])
+}

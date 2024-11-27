@@ -6,72 +6,127 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
-  
+
   if (!userId) {
     return NextResponse.json(
       { message: "User ID is required" },
       { status: 400 }
     );
   }
-  
-  try {
-    const ownedMeetings = await prisma.meeting.findMany({
-      where: {
-        participants: {
-          some: {
-            userId: userId,
-            role: "OWNER",
-          },
-        },
-      },
-      include: {
-        participants: {
-          include: {
-            user: true,
-          },
-        },
-        dateSelections: {
-          include: {
-            date: true,
-          },
-        },
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
-    });
 
-    const participatedMeetings = await prisma.meeting.findMany({
-      where: {
-        participants: {
-          some: {
-            userId: userId,
-            role: "PARTICIPANT",
+  try {
+    const [hostedMeeting, joinedMeeting, stats] = await Promise.all([
+      prisma.meeting.findMany({
+        where: {
+          participants: {
+            some: {
+              userId: userId,
+              role: "OWNER",
+            },
           },
         },
-      },
-      include: {
-        participants: {
-          include: {
-            user: true,
+        include: {
+          participants: {
+            include: {
+              user: true,
+            },
+          },
+          dateSelections: {
+            include: {
+              date: true,
+            },
           },
         },
-        dateSelections: {
-          include: {
-            date: true,
+        orderBy: {
+          updatedAt: "desc",
+        },
+      }),
+      prisma.meeting.findMany({
+        where: {
+          participants: {
+            some: {
+              userId: userId,
+              role: "PARTICIPANT",
+            },
           },
         },
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
-    });
+        include: {
+          participants: {
+            include: {
+              user: true,
+            },
+          },
+          dateSelections: {
+            include: {
+              date: true,
+            },
+          },
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      }),
+
+      prisma.meeting.groupBy({
+        where: {
+          OR: [
+            { 
+              participants: { 
+                some: { 
+                  userId: userId, 
+                  role: "OWNER" 
+                } 
+              } 
+            },
+            { 
+              participants: { 
+                some: { 
+                  userId: userId, 
+                  role: "PARTICIPANT" 
+                } 
+              } 
+            }
+          ]
+        },
+        by: ['status'],
+        _count: {
+          id: true
+        }
+      }),
+    ]);
+
+    // Calculate statistics
+    const statsResult = {
+      hostedMeeting: await prisma.meeting.count({
+        where: { 
+          participants: { 
+            some: { 
+              userId: userId, 
+              role: "OWNER" 
+            } 
+          } 
+        }
+      }),
+      joinedMeeting: await prisma.meeting.count({
+        where: { 
+          participants: { 
+            some: { 
+              userId: userId, 
+              role: "PARTICIPANT" 
+            } 
+          } 
+        }
+      }),
+      arrangingMeeting: stats.find(s => s.status === 'PUBLISHED')?._count.id || 0,
+      scheduledMeeting: stats.find(s => s.status === 'SCHEDULED')?._count.id || 0
+    };
 
     return NextResponse.json(
       {
         message: "Meetings fetched successfully",
-        ownedMeetings,
-        participatedMeetings,
+        hostedMeeting,
+        joinedMeeting,
+        stats: statsResult,
       },
       { status: 200 }
     );
@@ -118,6 +173,7 @@ export async function POST(req: NextRequest) {
     const ownerParticipant = await prisma.meetingParticipant.create({
       data: {
         role: "OWNER",
+        responseStatus: "ACCEPTED",
         user: {
           connect: { id: participants[0] },
         },

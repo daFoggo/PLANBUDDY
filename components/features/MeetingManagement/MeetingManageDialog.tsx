@@ -19,7 +19,7 @@ const MeetingManageDialog = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <CalendarPlus className="mr-2" />
+          <CalendarPlus className="size-4" />
           Create new
         </Button>
       </DialogTrigger>

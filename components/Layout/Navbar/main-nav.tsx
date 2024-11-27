@@ -21,7 +21,7 @@ const MainNav = ({ items }: IMainNavProps) => {
             <NavigationMenuItem key={item.title}>
               <Link href={item.href} legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  <p className="text-base">{item.title}</p>
+                  <p>{item.title}</p>
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>

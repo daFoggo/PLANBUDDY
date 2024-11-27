@@ -23,7 +23,7 @@ const MobileNav = ({ items }: IMobileNavProps) => {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-5 w-5" />
+          <Menu className="size-4" />
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>

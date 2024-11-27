@@ -60,7 +60,7 @@ const LoginButton = ({ status, session }: ILoginButtonProps) => {
               className="w-full"
               variant="outline"
             >
-              <FaGoogle className="mr-2" />
+              <FaGoogle className="size-4" />
               Continue with Google
             </Button>
           </div>

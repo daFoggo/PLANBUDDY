@@ -1,4 +1,4 @@
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 import {
   DropdownMenu,
@@ -11,11 +11,10 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-const UserMenu = () => {
-  const { data: session } = useSession();
-
-  return (  
+const UserMenu = ({ session }: any) => {
+  return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative w-8 h-8 rounded-full">
@@ -27,7 +26,7 @@ const UserMenu = () => {
             <AvatarFallback>
               {session?.user?.name
                 ?.split(" ")
-                .map((n) => n[0])
+                .map((n: any) => n[0])
                 .join("")
                 .toUpperCase() || "U"}
             </AvatarFallback>
@@ -46,10 +45,12 @@ const UserMenu = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <User className="w-4 h-4 mr-2" />
-          Profile
-        </DropdownMenuItem>
+        <Link href="/profile" className="w-full">
+          <DropdownMenuItem>
+            <User className="w-4 h-4 mr-2" />
+            Profile
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem>
           <Settings className="w-4 h-4 mr-2" />
           Settings

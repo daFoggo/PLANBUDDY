@@ -1,14 +1,20 @@
-import NextAuth, { DefaultSession } from "next-auth";
-import { UserType } from "@prisma/client";
+import "next-auth";
 
 declare module "next-auth" {
   interface Session {
     user: {
-      userType: UserType;
-    } & DefaultSession["user"];
+      id: string;
+      userType: "GOOGLE_USER" | "GUEST";
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
   }
+}
 
+declare module "next-auth/jwt" {
   interface JWT {
-    userType: UserType;
+    id: string;
+    userType: "GOOGLE_USER" | "GUEST";
   }
 }

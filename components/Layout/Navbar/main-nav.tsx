@@ -7,7 +7,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { IMainNavProps } from "@/types/navbar";
-import Logo from "../Logo";
+import Logo from "@/components/common/Logo";
 
 const MainNav = ({ items }: IMainNavProps) => {
   return (

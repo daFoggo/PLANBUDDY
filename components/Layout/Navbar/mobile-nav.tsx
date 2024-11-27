@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import MobileLink from "./mobile-link";
 import { IMobileNavProps } from "@/types/navbar";
-import Logo from "../Logo";
+import Logo from "@/components/common/Logo";
 
 const MobileNav = ({ items }: IMobileNavProps) => {
   const [open, setOpen] = React.useState(false);
@@ -20,18 +20,18 @@ const MobileNav = ({ items }: IMobileNavProps) => {
   }, []);
 
   return (
-   <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left">
+      <SheetContent side="left" onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetTitle>
           <Logo />
         </SheetTitle>
-        <nav className="flex flex-col space-y-3 mt-4">
+        <nav className="flex flex-col mt-4">
           {items.map((item) => (
             <MobileLink
               key={item.title}

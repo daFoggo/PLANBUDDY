@@ -9,14 +9,15 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { FaGoogle } from "react-icons/fa";
 import { useState } from "react";
 import UserMenu from "./UserMenu";
 import GuestLoginForm from "./GuestLoginForm";
 
-const LoginButton = () => {
-  const { status } = useSession();
+import { ILoginButtonProps } from "@/types/login-button";
+
+const LoginButton = ({ status, session }: ILoginButtonProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   if (status === "loading") {
@@ -68,7 +69,7 @@ const LoginButton = () => {
     );
   }
 
-  return <UserMenu />;
+  return <UserMenu session={session} />;
 };
 
 export default LoginButton;

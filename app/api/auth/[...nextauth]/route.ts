@@ -1,4 +1,3 @@
-// auth.ts
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +14,6 @@ const guestSchema = z.object({
   userType: z.literal("GUEST"),
 });
 
-// Tạo custom adapter bằng cách extend PrismaAdapter
 const customAdapter = {
   ...PrismaAdapter(prisma),
   createUser: async (user: any) => {
@@ -96,11 +94,20 @@ export const {
       if (user && account) {
         token.userType =
           account.provider === "google" ? "GOOGLE_USER" : "GUEST";
+        token.id = user.id;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
+        const user = await prisma.user.findUnique({
+          where: { email: session.user.email! },
+          select: { id: true },
+        });
+
+        if (user) {
+          session.user.id = user.id;
+        }
         session.user.userType = token.userType as "GOOGLE_USER" | "GUEST";
       }
       return session;

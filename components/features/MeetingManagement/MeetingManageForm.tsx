@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format, isSameDay, startOfWeek, parse, set } from "date-fns";
-import { CalendarIcon, Clock, Users } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,10 +31,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { timeOptions, steps, weekDays } from "./constant";
 import { IMeetingManageForm } from "@/types/meeting-manage-form";
+import { useAuth } from "@/hooks/use-auth";
 
 const formSchema = z
   .object({
     title: z.string().min(1, "Title is required"),
+    meetingType: z.string().min(1, "Meeting type is required"),
+    onlineMeetingUrl: z.string().optional(),
     description: z.string().optional(),
     location: z.string().optional(),
     note: z.string().optional(),
@@ -44,7 +46,9 @@ const formSchema = z
     dates: z.array(z.date()).min(1, {
       message: "Please select at least one date",
     }),
-    participants: z.array(z.string()).optional(),
+    participants: z
+      .array(z.string())
+      .min(1, "At least one participant is required"),
     isAllDay: z.boolean().optional(),
     dateType: z.string().optional(),
   })
@@ -62,6 +66,8 @@ const formSchema = z
   );
 
 const MeetingManageForm = ({ onClose }: IMeetingManageForm) => {
+  const { session } = useAuth();
+
   const [step, setStep] = useState(0);
   const [isAllDay, setIsAllDay] = useState(false);
 
@@ -69,18 +75,19 @@ const MeetingManageForm = ({ onClose }: IMeetingManageForm) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
+      meetingType: "",
+      onlineMeetingUrl: "",
       description: "",
       location: "",
       note: "",
       startTime: "",
       endTime: "",
       dates: [],
-      participants: [],
+      participants: session?.user?.id ? [session.user.id] : [],
       isAllDay: false,
       dateType: "",
     },
   });
-
   useEffect(() => {
     if (isAllDay) {
       form.setValue("startTime", "00:00");
@@ -97,14 +104,30 @@ const MeetingManageForm = ({ onClose }: IMeetingManageForm) => {
     return newDate;
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const meetingData = {
       ...values,
-      dates: values.dates.map((date) => format(date, "yyyy-MM-dd")),
+      dates: values.dates.map((date) => ({
+        date: date.getTime(),
+      })),
     };
 
-    console.log("Meeting Data:", meetingData);
-    onClose();
+    try {
+      const response = await fetch("/api/meeting", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(meetingData),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Meeting Created:", data);
+      }
+      onClose();
+    } catch (error) {
+      console.error("Meeting creation failed:", error);
+    }
   };
 
   return (
@@ -125,8 +148,13 @@ const MeetingManageForm = ({ onClose }: IMeetingManageForm) => {
         ))}
       </TabsList>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
-          <TabsContent value="Basic Infos" className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit((values) => {
+            onSubmit(values);
+          })}
+          className="space-y-6 mt-6"
+        >
+          <TabsContent value="Basic Infos" className="space-y-4 text-left">
             <FormField
               control={form.control}
               name="title"
@@ -140,6 +168,48 @@ const MeetingManageForm = ({ onClose }: IMeetingManageForm) => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="meetingType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Meeting Type</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select meeting type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="online">Online</SelectItem>
+                        <SelectItem value="offline">Offline</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {form.watch("meetingType") === "online" && (
+              <FormField
+                control={form.control}
+                name="onlineMeetingUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Online Meeting URL</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter online meeting URL"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="description"
@@ -169,8 +239,24 @@ const MeetingManageForm = ({ onClose }: IMeetingManageForm) => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="note"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Note</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Note something for people"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </TabsContent>
-          <TabsContent value="Date & Time" className="space-y-4">
+          <TabsContent value="Date & Time" className="space-y-4 text-left">
             <FormField
               control={form.control}
               name="dateType"
@@ -342,18 +428,19 @@ const MeetingManageForm = ({ onClose }: IMeetingManageForm) => {
             >
               Previous
             </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                if (step < steps.length - 1) {
+            {step === steps.length - 1 ? (
+              <Button type="submit">Submit</Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
                   setStep((prev) => prev + 1);
-                } else {
-                  form.handleSubmit(onSubmit)();
-                }
-              }}
-            >
-              {step === steps.length - 1 ? "Submit" : "Next"}
-            </Button>
+                }}
+              >
+                Next
+              </Button>
+            )}
           </div>
         </form>
       </Form>

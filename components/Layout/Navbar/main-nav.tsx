@@ -16,11 +16,11 @@ const MainNav = ({ items }: IMainNavProps) => {
         <Logo />
       </Link>
       <NavigationMenu>
-        <NavigationMenuList>
+        <NavigationMenuList className="space-x-3">
           {items.map((item) => (
-            <NavigationMenuItem key={item.title}>
+            <NavigationMenuItem key={item.title} className="hover:bg-muted py-2 px-3 rounded-md transition-colors">
               <Link href={item.href} legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink>
                   <p>{item.title}</p>
                 </NavigationMenuLink>
               </Link>

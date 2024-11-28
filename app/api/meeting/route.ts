@@ -6,7 +6,56 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
+  const meetingId = searchParams.get("meetingId");
 
+  // fetch meeting detail
+  if (meetingId) {
+    try {
+      const meeting = await prisma.meeting.findUnique({
+        where: { id: meetingId },
+        include: {
+          participants: {
+            include: {
+              user: true,
+            },
+          },
+          dateSelections: {
+            include: {
+              date: true,
+            },
+          },
+        },
+      });
+
+      if (!meeting) {
+        return NextResponse.json(
+          { message: "Meeting not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          message: "Meeting fetched successfully",
+          meeting,
+        },
+        { status: 200 }
+      );
+    } catch (error) {
+      console.error(error);
+      return NextResponse.json(
+        {
+          message: "Failed to fetch meeting",
+          error: error instanceof Error ? error.message : "Unknown error",
+        },
+        { status: 500 }
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  // fetch overview meeting data
   if (!userId) {
     return NextResponse.json(
       { message: "User ID is required" },
@@ -70,55 +119,57 @@ export async function GET(req: NextRequest) {
       prisma.meeting.groupBy({
         where: {
           OR: [
-            { 
-              participants: { 
-                some: { 
-                  userId: userId, 
-                  role: "OWNER" 
-                } 
-              } 
+            {
+              participants: {
+                some: {
+                  userId: userId,
+                  role: "OWNER",
+                },
+              },
             },
-            { 
-              participants: { 
-                some: { 
-                  userId: userId, 
-                  role: "PARTICIPANT" 
-                } 
-              } 
-            }
-          ]
+            {
+              participants: {
+                some: {
+                  userId: userId,
+                  role: "PARTICIPANT",
+                },
+              },
+            },
+          ],
         },
-        by: ['status'],
+        by: ["status"],
         _count: {
-          id: true
-        }
+          id: true,
+        },
       }),
     ]);
 
     // Calculate statistics
     const statsResult = {
       hostedMeeting: await prisma.meeting.count({
-        where: { 
-          participants: { 
-            some: { 
-              userId: userId, 
-              role: "OWNER" 
-            } 
-          } 
-        }
+        where: {
+          participants: {
+            some: {
+              userId: userId,
+              role: "OWNER",
+            },
+          },
+        },
       }),
       joinedMeeting: await prisma.meeting.count({
-        where: { 
-          participants: { 
-            some: { 
-              userId: userId, 
-              role: "PARTICIPANT" 
-            } 
-          } 
-        }
+        where: {
+          participants: {
+            some: {
+              userId: userId,
+              role: "PARTICIPANT",
+            },
+          },
+        },
       }),
-      arrangingMeeting: stats.find(s => s.status === 'PUBLISHED')?._count.id || 0,
-      scheduledMeeting: stats.find(s => s.status === 'SCHEDULED')?._count.id || 0
+      arrangingMeeting:
+        stats.find((s) => s.status === "PUBLISHED")?._count.id || 0,
+      scheduledMeeting:
+        stats.find((s) => s.status === "SCHEDULED")?._count.id || 0,
     };
 
     return NextResponse.json(
@@ -146,10 +197,11 @@ export async function POST(req: NextRequest) {
     const {
       title,
       meetingType,
-      onlineMeetingUrl,
       description,
       location,
       note,
+      dateType,
+      isAllDay,
       startTime,
       endTime,
       dates,
@@ -160,10 +212,11 @@ export async function POST(req: NextRequest) {
       data: {
         title,
         meetingType,
-        onlineMeetingUrl,
         description,
         location,
         note,
+        dateType,
+        isAllDay,
         startTime,
         endTime,
         status: "PUBLISHED",
@@ -215,6 +268,91 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         message: "Failed to create meeting",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const {
+      id,
+      title,
+      meetingType,
+      description,
+      location,
+      note,
+      dateType,
+      isAllDay,
+      startTime,
+      endTime,
+      dates,
+      status,
+    } = await req.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Meeting ID is required for update" },
+        { status: 400 }
+      );
+    }
+
+    const updatedMeeting = await prisma.meeting.update({
+      where: { id },
+      data: {
+        title,
+        meetingType,
+        description,
+        location,
+        note,
+        dateType,
+        isAllDay,
+        startTime,
+        endTime,
+        status: status || "PUBLISHED",
+      },
+    });
+
+    if (dates && dates.length > 0) {
+      await prisma.meetingDateSelection.deleteMany({
+        where: { meetingId: id },
+      });
+
+      await Promise.all(
+        dates.map(async (date: any) => {
+          const meetingDate = await prisma.meetingDate.upsert({
+            where: { date: new Date(date.date) },
+            update: {},
+            create: { date: new Date(date.date) },
+          });
+
+          return prisma.meetingDateSelection.create({
+            data: {
+              meeting: { connect: { id } },
+              date: { connect: { id: meetingDate.id } },
+              isFinal: false,
+            },
+          });
+        })
+      );
+    }
+
+    return NextResponse.json(
+      {
+        message: "Meeting updated successfully",
+        meeting: updatedMeeting,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      {
+        message: "Failed to update meeting",
         error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }

@@ -12,7 +12,7 @@ const Overview = ({ overviewData }: IOverviewProps) => {
           icon={<Combine className="size-4" />}
           title="Arranging"
           value={overviewData?.stats.arrangingMeeting.toString() || "N/A"}
-          description="meetings are currently being arranged"
+          description="meetings are published and currently being arranged"
         />
 
         <StatisticBLock

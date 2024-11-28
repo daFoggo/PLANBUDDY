@@ -1,9 +1,11 @@
 "use client";
-
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
+
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,24 +16,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
 
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(3, "Name must be at least 3 characters")
-    .max(50, "Name must not exceed 50 characters")
-    .regex(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
-});
+import { formSchema } from "./constant";
+import { IGuestLoginFormProps } from "@/types/guest-login-form";
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface GuestLoginFormProps {
-  onClose: () => void;
-}
-
-const GuestLoginForm = ({ onClose }: GuestLoginFormProps) => {
+const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({

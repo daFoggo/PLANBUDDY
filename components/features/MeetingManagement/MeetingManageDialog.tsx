@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { CalendarCog, CalendarPlus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,26 +11,41 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import MeetingMangeForm from "./MeetingManageForm";
-import { CalendarPlus } from "lucide-react";
 
-const MeetingManageDialog = () => {
+import { IMeetingManageDialogProps } from "@/types/meeting-manage-dialog";
+
+const MeetingManageDialog = ({
+  manageType,
+  meetingData,
+}: IMeetingManageDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <CalendarPlus className="size-4" />
-          Create new
+          {manageType === "create" ? (
+            <CalendarPlus className="size-4" />
+          ) : (
+            <CalendarCog className="size-4" />
+          )}
+          {manageType === "create" ? "Create Meeting" : "Edit Meeting"}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95%] sm:w-[625px] rounded-lg">
         <DialogHeader>
-          <DialogTitle className="text-xl">Create a new meeting</DialogTitle>
+          <DialogTitle className="text-xl">
+            {manageType === "create" ? "Create Meeting" : "Edit Meeting"}
+          </DialogTitle>
           <DialogDescription>
-            Schedule your meeting in one minute!
+            {manageType === "create"
+              ? "Schedule new meeting in just one minute!"
+              : "Edit your meeting details"}
           </DialogDescription>
-          <MeetingMangeForm onClose={() => setIsOpen(false)} />
+          <MeetingMangeForm
+            onClose={() => setIsOpen(false)}
+            meetingData={meetingData}
+          />
         </DialogHeader>
       </DialogContent>
     </Dialog>

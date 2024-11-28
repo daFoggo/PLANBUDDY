@@ -15,15 +15,18 @@ export interface IMeeting {
   id: string;
   title: string;
   meetingType: string;
-  onlineMeetingUrl: string;
-  description: string;
-  location: string;
-  note: string;
+  description?: string;
+  location?: string;
+  note?: string;
+  isAllDay?: boolean;
   startTime: string;
   endTime: string;
   status: string;
   participants: IParticipant[];
+  dateType: string;
   dateSelections: IDateSelection[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IParticipant {
@@ -55,6 +58,7 @@ export interface IDate {
 export interface IOverviewProps {
   overviewData?: IMeetingData;
 }
+
 export interface IMeetingListProps {
   meetingListData?: IMeeting[];
 }

@@ -8,6 +8,8 @@ import MeetingList from "@/components/features/Dashboard/MeetingList";
 
 import { IMeetingData } from "@/types/dashboard";
 import { TABLIST } from "./constant";
+import PageTitle from "@/components/common/PageTitle";
+import { LayoutDashboard } from "lucide-react";
 
 const Dashboard = () => {
   const [meetingData, setMeetingData] = useState<IMeetingData>();
@@ -33,7 +35,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-semibold">Dashboard</h1>
+      <PageTitle name="Dashboard" icon={<LayoutDashboard />} />
       <Tabs defaultValue="overview">
         <TabsList>
           {TABLIST.map((tab, index) => (

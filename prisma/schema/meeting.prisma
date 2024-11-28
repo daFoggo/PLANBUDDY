@@ -1,16 +1,17 @@
 model Meeting {
-  id               String   @id @default(cuid())
-  title            String
-  meetingType      String
-  onlineMeetingUrl String?
-  description      String?
-  location         String?
-  note             String?
-  startTime        String?
-  endTime          String?
-  status           String   @default("PUBLISHED")
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  meetingType String
+  description String?
+  location    String?
+  note        String?
+  dateType    String?
+  isAllDay    Boolean  @default(false)
+  startTime   String?
+  endTime     String?
+  status      String   @default("PUBLISHED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations (1:n)
   participants   MeetingParticipant[]

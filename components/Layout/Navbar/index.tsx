@@ -21,7 +21,7 @@ const NavBar = () => {
       }
       <MobileNav items={navItems} />
       <div className="flex flex-1 items-center justify-end space-x-4">
-        {session ? <MeetingManageDialog /> : null}
+        {session ? <MeetingManageDialog manageType="create" /> : null}
         <ThemeToggle />
         <LoginButton status={status} session={session} />
       </div>

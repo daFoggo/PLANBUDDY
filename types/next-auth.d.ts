@@ -1,6 +1,7 @@
 import "next-auth";
 
 declare module "next-auth" {
+  // config this for model in auth route
   interface Session {
     user: {
       id: string;
@@ -8,6 +9,7 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
+      timeZone?: string | null;
     };
   }
 }

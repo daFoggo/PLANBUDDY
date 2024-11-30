@@ -43,8 +43,9 @@ model AvailableSlot {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   date      DateTime
-  startTime DateTime
-  endTime   DateTime
+  startTime String
+  endTime   String
+  timeZone  String
   status    SlotStatus @default(AVAILABLE)
 
   createdAt DateTime @default(now())

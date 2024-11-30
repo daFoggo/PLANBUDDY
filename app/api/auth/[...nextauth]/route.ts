@@ -19,12 +19,16 @@ const customAdapter = {
   createUser: async (user: any) => {
     const data = {
       ...user,
+      email: user.email || `${user.name}@placeholder.com`,
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
       userType: "GOOGLE_USER",
     };
 
     const newUser = await prisma.user.create({ data });
-    return newUser;
+    return {
+      ...newUser,
+      email: newUser.email || `${newUser.name}@placeholder.com`,
+    };
   },
 };
 
@@ -78,6 +82,7 @@ export const {
           },
         });
 
+        // add more return data here
         return {
           id: user.id,
           name: user.name,
@@ -85,6 +90,7 @@ export const {
           image: user.image,
           emailVerified: user.emailVerified,
           userType: user.userType,
+          timeZone: user.timeZone,
         };
       },
     }),
@@ -102,11 +108,14 @@ export const {
       if (token) {
         const user = await prisma.user.findUnique({
           where: { email: session.user.email! },
-          select: { id: true },
+          // select more data if you need
+          select: { id: true, timeZone: true },
         });
 
         if (user) {
           session.user.id = user.id;
+          // after select, add here
+          session.user.timeZone = user.timeZone;
         }
         session.user.userType = token.userType as "GOOGLE_USER" | "GUEST";
       }

@@ -17,13 +17,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import MeetingManageDialog from "@/components/features/MeetingManagement/MeetingManageDialog";
+import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
+import { headers } from "next/headers";
 
-const MeetingDetail = async ({ params }: { params: { id: string } }) => {
+const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL}/api/meeting?meetingId=${params.id}`,
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/meeting?meetingId=${params.meetingId}`,
       {
+        headers: {
+          cookie: headers().get("cookie") || "",
+        },
         cache: "no-store",
       }
     );
@@ -31,9 +35,8 @@ const MeetingDetail = async ({ params }: { params: { id: string } }) => {
     if (!response.ok) {
       notFound();
     }
-
     const data = await response.json();
-    const meeting: IMeeting = { ...data.meeting, id: params.id };
+    const meeting: IMeeting = { ...data.meeting, id: params.meetingId };
 
     const { date, time } = formatMeetingDateTime(meeting);
 
@@ -100,7 +103,7 @@ const MeetingDetail = async ({ params }: { params: { id: string } }) => {
                 </div>
               </CardDescription>
             </div>
-            <MeetingManageDialog manageType="edit" meetingData={meeting} />
+            <MeetingCUDialog manageType="edit" meetingData={meeting} />
           </CardHeader>
           <CardContent className="flex items-center space-x-4 p-0"></CardContent>
         </Card>

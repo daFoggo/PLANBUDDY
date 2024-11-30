@@ -36,6 +36,7 @@ import {
   getStatusColor,
 } from "@/components/utils/helper/meeting-list";
 import { Separator } from "@/components/ui/separator";
+import { MEETING_TYPE } from "@/components/utils/constant";
 
 const MeetingList = ({ meetingListData }: IMeetingListProps) => {
   const [currentView, setCurrentView] = useState<"list" | "grid">("list");
@@ -52,7 +53,7 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
     sortedMeetings.forEach((meeting) => {
       const date = meeting.createdAt;
       if (date) {
-        const formattedDate = format(parseISO(date), "yyyy-MM-dd");
+        const formattedDate = format(new Date(date), "yyyy-MM-dd");
         if (!groups[formattedDate]) {
           groups[formattedDate] = [];
         }
@@ -83,7 +84,7 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button variant="outline" size="icon">
-                    {meeting.meetingType === "online" ? (
+                    {meeting?.meetingType === MEETING_TYPE.ONLINE ? (
                       <Video className="size-4" />
                     ) : (
                       <MapPin className="size-4" />
@@ -91,7 +92,7 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent align="center" className="text-xs">
-                  {meeting.meetingType === "online"
+                  {meeting?.meetingType === MEETING_TYPE.INPERSON
                     ? "Online Meeting"
                     : "In-person Meeting"}
                 </TooltipContent>
@@ -143,7 +144,7 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
               </div>
 
               <Separator orientation="vertical" className="h-4" />
-              
+
               <div className="flex items-center space-x-2 text-sm text-muted-foreground font-semibold">
                 <Clock className="size-4 text-foreground" />
                 <span>{time}</span>

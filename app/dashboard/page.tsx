@@ -1,6 +1,5 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { headers } from "next/headers";
+import { auth } from "../api/auth/[...nextauth]/route";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Overview from "@/components/features/Dashboard/Overview";
@@ -11,27 +10,28 @@ import { TABLIST } from "./constant";
 import PageTitle from "@/components/common/PageTitle";
 import { LayoutDashboard } from "lucide-react";
 
-const Dashboard = () => {
-  const [meetingData, setMeetingData] = useState<IMeetingData>();
-  const { session } = useAuth();
+const Dashboard = async () => {
+  const session = await auth();
 
-  useEffect(() => {
-    if (session?.user?.id) {
-      handleGetMeetingData();
-    }
-  }, [session]);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
 
-  const handleGetMeetingData = async () => {
-    try {
-      const res = await fetch(
-        `/api/meeting?userId=${session?.user?.id ? session.user.id : ""}`
-      );
-      const data = await res.json();
-      setMeetingData(data);
-    } catch (error) {
-      console.error(error);
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SITE_URL}/api/meeting?userId=${session.user.id}`,
+    {
+      headers: {
+        cookie: headers().get("cookie") || "",
+      },
+      cache: "no-store",
     }
-  };
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch dashboard data");
+  }
+
+  const meetingData = await response.json();
 
   return (
     <div className="flex flex-col gap-6">
@@ -48,10 +48,10 @@ const Dashboard = () => {
           <Overview overviewData={meetingData} />
         </TabsContent>
         <TabsContent value="hostedMeeting">
-          <MeetingList meetingListData={meetingData?.hostedMeeting} />
+          <MeetingList meetingListData={meetingData?.hostedMeeting || []} />
         </TabsContent>
         <TabsContent value="joinedMeeting">
-          <MeetingList meetingListData={meetingData?.joinedMeeting} />
+          <MeetingList meetingListData={meetingData?.joinedMeeting || []} />
         </TabsContent>
       </Tabs>
     </div>

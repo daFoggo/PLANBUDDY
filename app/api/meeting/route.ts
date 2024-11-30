@@ -1,359 +1,263 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { auth } from "../auth/[...nextauth]/route";
+import { PARTICIPANT_ROLE } from "@/components/utils/constant";
 
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const userId = searchParams.get("userId");
-  const meetingId = searchParams.get("meetingId");
+  try {
+    // comment if you need to test api on postman
+    const session = await auth();
 
-  // fetch meeting detail
-  if (meetingId) {
-    try {
-      const meeting = await prisma.meeting.findUnique({
-        where: { id: meetingId },
-        include: {
-          participants: {
-            include: {
-              user: true,
-            },
-          },
-          dateSelections: {
-            include: {
-              date: true,
-            },
-          },
-        },
-      });
+    if (!session?.user?.id) {
+      console.log("No session user ID"); // Add this
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-      if (!meeting) {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+    const meetingId = searchParams.get("meetingId");
+
+    // fetch meeting detail
+    if (meetingId) {
+      try {
+        const meeting = await prisma.meeting.findUnique({
+          where: {
+            id: meetingId,
+          },
+          include: {
+            participants: {
+              include: {
+                user: true,
+              },
+            },
+            availableSlots: true,
+          },
+        });
+
+        if (!meeting) {
+          return NextResponse.json(
+            { error: "Meeting not found" },
+            { status: 404 }
+          );
+        }
+
+        return NextResponse.json({ meeting });
+      } catch (error) {
+        console.log("Error getting meeting:", error);
         return NextResponse.json(
-          { message: "Meeting not found" },
-          { status: 404 }
+          {
+            error: "Failed to get meeting",
+            details: error instanceof Error ? error.message : "Unknown error",
+          },
+          { status: 500 }
+        );
+      } finally {
+        await prisma.$disconnect();
+      }
+    }
+
+    // fetch meetings data of user
+    if (userId) {
+      try {
+        const [hostedMeeting, joinedMeeting, stats] = await Promise.all([
+          // hosted meeting
+          prisma.meeting.findMany({
+            where: {
+              participants: {
+                some: {
+                  userId: userId,
+                  role: PARTICIPANT_ROLE.OWNER,
+                },
+              },
+            },
+            include: {
+              participants: {
+                include: {
+                  user: true,
+                },
+              },
+              availableSlots: true,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          }),
+          //joined meeting
+          prisma.meeting.findMany({
+            where: {
+              participants: {
+                some: {
+                  userId: userId,
+                  role: PARTICIPANT_ROLE.PARTICIPANT,
+                },
+              },
+            },
+            include: {
+              participants: {
+                include: {
+                  user: true,
+                },
+              },
+              availableSlots: true,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          }),
+          // stats
+          prisma.meeting.groupBy({
+            where: {
+              OR: [
+                {
+                  participants: {
+                    some: {
+                      userId: userId,
+                      role: PARTICIPANT_ROLE.OWNER,
+                    },
+                  },
+                },
+                {
+                  participants: {
+                    some: {
+                      userId: userId,
+                      role: PARTICIPANT_ROLE.PARTICIPANT,
+                    },
+                  },
+                },
+              ],
+            },
+            by: ["status"],
+            _count: {
+              id: true,
+            },
+          }),
+        ]);
+
+        const statsResult = {
+          hostedMeeting: await prisma.meeting.count({
+            where: {
+              participants: {
+                some: {
+                  userId: userId,
+                  role: PARTICIPANT_ROLE.OWNER,
+                },
+              },
+            },
+          }),
+          joinedMeeting: await prisma.meeting.count({
+            where: {
+              participants: {
+                some: {
+                  userId: userId,
+                  role: PARTICIPANT_ROLE.PARTICIPANT,
+                },
+              },
+            },
+          }),
+          arrangingMeeting:
+            stats.find((stat: any) => stat.status === "PUBLISHED")?._count
+              ?.id || 0,
+          scheduledMeeting:
+            stats.find((stat: any) => stat.status === "SCHEDULED")?._count
+              ?.id || 0,
+        };
+
+        return NextResponse.json({
+          hostedMeeting,
+          joinedMeeting,
+          stats: statsResult,
+        });
+      } catch (error) {
+        console.log("Error getting meeting:", error);
+        return NextResponse.json(
+          {
+            error: "Failed to get meeting",
+            details: error instanceof Error ? error.message : "Unknown error",
+          },
+          { status: 500 }
         );
       }
-
-      return NextResponse.json(
-        {
-          message: "Meeting fetched successfully",
-          meeting,
-        },
-        { status: 200 }
-      );
-    } catch (error) {
-      console.error(error);
-      return NextResponse.json(
-        {
-          message: "Failed to fetch meeting",
-          error: error instanceof Error ? error.message : "Unknown error",
-        },
-        { status: 500 }
-      );
-    } finally {
-      await prisma.$disconnect();
     }
-  }
-
-  // fetch overview meeting data
-  if (!userId) {
-    return NextResponse.json(
-      { message: "User ID is required" },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const [hostedMeeting, joinedMeeting, stats] = await Promise.all([
-      prisma.meeting.findMany({
-        where: {
-          participants: {
-            some: {
-              userId: userId,
-              role: "OWNER",
-            },
-          },
-        },
-        include: {
-          participants: {
-            include: {
-              user: true,
-            },
-          },
-          dateSelections: {
-            include: {
-              date: true,
-            },
-          },
-        },
-        orderBy: {
-          updatedAt: "desc",
-        },
-      }),
-      prisma.meeting.findMany({
-        where: {
-          participants: {
-            some: {
-              userId: userId,
-              role: "PARTICIPANT",
-            },
-          },
-        },
-        include: {
-          participants: {
-            include: {
-              user: true,
-            },
-          },
-          dateSelections: {
-            include: {
-              date: true,
-            },
-          },
-        },
-        orderBy: {
-          updatedAt: "desc",
-        },
-      }),
-
-      prisma.meeting.groupBy({
-        where: {
-          OR: [
-            {
-              participants: {
-                some: {
-                  userId: userId,
-                  role: "OWNER",
-                },
-              },
-            },
-            {
-              participants: {
-                some: {
-                  userId: userId,
-                  role: "PARTICIPANT",
-                },
-              },
-            },
-          ],
-        },
-        by: ["status"],
-        _count: {
-          id: true,
-        },
-      }),
-    ]);
-
-    // Calculate statistics
-    const statsResult = {
-      hostedMeeting: await prisma.meeting.count({
-        where: {
-          participants: {
-            some: {
-              userId: userId,
-              role: "OWNER",
-            },
-          },
-        },
-      }),
-      joinedMeeting: await prisma.meeting.count({
-        where: {
-          participants: {
-            some: {
-              userId: userId,
-              role: "PARTICIPANT",
-            },
-          },
-        },
-      }),
-      arrangingMeeting:
-        stats.find((s) => s.status === "PUBLISHED")?._count.id || 0,
-      scheduledMeeting:
-        stats.find((s) => s.status === "SCHEDULED")?._count.id || 0,
-    };
-
-    return NextResponse.json(
-      {
-        message: "Meetings fetched successfully",
-        hostedMeeting,
-        joinedMeeting,
-        stats: statsResult,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({
-      message: "Failed to fetch meetings",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
-  } finally {
-    await prisma.$disconnect();
-  }
+  } catch (error) {}
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const {
-      title,
-      meetingType,
-      description,
-      location,
-      note,
-      dateType,
-      isAllDay,
-      startTime,
-      endTime,
-      dates,
-      participants,
-    } = await req.json();
+    // Check authentication
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
+    const meetingData = await req.json();
+
+    // Create the meeting
     const meeting = await prisma.meeting.create({
       data: {
-        title,
-        meetingType,
-        description,
-        location,
-        note,
-        dateType,
-        isAllDay,
-        startTime,
-        endTime,
-        status: "PUBLISHED",
-      },
-    });
+        title: meetingData.title,
+        description: meetingData.description || null,
+        meetingType: meetingData.meetingType,
+        location: meetingData.location || null,
+        note: meetingData.note || null,
+        dateType: meetingData.dateType,
+        proposedDates: meetingData.proposedDates.map(
+          (date: string) => new Date(date)
+        ),
+        status: meetingData.status,
 
-    const ownerParticipant = await prisma.meetingParticipant.create({
-      data: {
-        role: "OWNER",
-        responseStatus: "ACCEPTED",
-        user: {
-          connect: { id: participants[0] },
-        },
-        meeting: {
-          connect: { id: meeting.id },
-        },
-      },
-    });
-
-    const dateSelections = await Promise.all(
-      dates.map(async (date: any) => {
-        const meetingDate = await prisma.meetingDate.upsert({
-          where: { date: new Date(date.date) },
-          update: {},
-          create: { date: new Date(date.date) },
-        });
-
-        return prisma.meetingDateSelection.create({
-          data: {
-            meeting: { connect: { id: meeting.id } },
-            date: { connect: { id: meetingDate.id } },
-            isFinal: false,
-          },
-        });
-      })
-    );
-
-    return NextResponse.json(
-      {
-        message: "Meeting created successfully",
-        meeting,
-        ownerParticipant,
-        dateSelections,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "Failed to create meeting",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-export async function PUT(req: NextRequest) {
-  try {
-    const {
-      id,
-      title,
-      meetingType,
-      description,
-      location,
-      note,
-      dateType,
-      isAllDay,
-      startTime,
-      endTime,
-      dates,
-      status,
-    } = await req.json();
-
-    if (!id) {
-      return NextResponse.json(
-        { message: "Meeting ID is required for update" },
-        { status: 400 }
-      );
-    }
-
-    const updatedMeeting = await prisma.meeting.update({
-      where: { id },
-      data: {
-        title,
-        meetingType,
-        description,
-        location,
-        note,
-        dateType,
-        isAllDay,
-        startTime,
-        endTime,
-        status: status || "PUBLISHED",
-      },
-    });
-
-    if (dates && dates.length > 0) {
-      await prisma.meetingDateSelection.deleteMany({
-        where: { meetingId: id },
-      });
-
-      await Promise.all(
-        dates.map(async (date: any) => {
-          const meetingDate = await prisma.meetingDate.upsert({
-            where: { date: new Date(date.date) },
-            update: {},
-            create: { date: new Date(date.date) },
-          });
-
-          return prisma.meetingDateSelection.create({
-            data: {
-              meeting: { connect: { id } },
-              date: { connect: { id: meetingDate.id } },
-              isFinal: false,
+        // Create participants
+        participants: {
+          create: [
+            // map user
+            {
+              userId: session.user.id,
+              role: "OWNER",
             },
-          });
-        })
-      );
-    }
+            // future feature that can add participants from start
+            ...(meetingData.participants || [])
+              .filter(
+                (participant: { userId: string }) =>
+                  participant.userId !== session.user.id
+              )
+              .map((participant: any) => ({
+                userId: participant.userId,
+                role: participant.role || "PARTICIPANT",
+              })),
+          ],
+        },
+
+        // Create available slots
+        availableSlots: {
+          create: meetingData.availableSlots.map((slot: any) => ({
+            userId: session?.user?.id,
+            date: new Date(slot.date),
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            timeZone: slot.timeZone,
+          })),
+        },
+      },
+      include: {
+        participants: true,
+        availableSlots: true,
+      },
+    });
 
     return NextResponse.json(
       {
-        message: "Meeting updated successfully",
-        meeting: updatedMeeting,
+        meeting,
       },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (error) {
-    console.error(error);
+    console.error("Error creating meeting:", error);
+
     return NextResponse.json(
       {
-        message: "Failed to update meeting",
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: "Failed to create meeting",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

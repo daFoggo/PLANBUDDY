@@ -1,6 +1,6 @@
 import { IMeeting } from "./dashboard";
 
-export interface IMeetingManageDialogProps {
+export interface IMeetingCUDialogProps {
     manageType: string;
     meetingData?: IMeeting;
 }

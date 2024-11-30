@@ -1,4 +1,4 @@
-import { format, parse, parseISO } from "date-fns";
+import { format, isThisWeek, parse, parseISO } from "date-fns";
 import { IMeeting } from "@/types/dashboard";
 
 export const getStatusColor = (status: string) => {
@@ -16,45 +16,27 @@ export const getStatusColor = (status: string) => {
 
 export const formatMeetingDateTime = (meeting: IMeeting) => {
   try {
-    if (!meeting.dateSelections || meeting.dateSelections.length === 0) {
-      return { date: "TBD", time: "TBD" };
-    }
-
-    const finalDate = meeting.dateSelections.find((date) => date.isFinal);
-    const dates = finalDate
-      ? [finalDate.date.date]
-      : meeting.dateSelections.map((date) => date.date.date);
-
-    const parsedDates = dates
-      .map((dateStr) => {
-        try {
-          return parseISO(dateStr);
-        } catch {
-          return null;
+    const dates = meeting.proposedDates.map((date) => new Date(date));
+    const formattedDates = dates
+      .map((date) => {
+        if (isThisWeek(date, { weekStartsOn: 1 })) {
+          return format(date, "EEE");
         }
+        return format(date, "MMM d");
       })
-      .filter((date): date is Date => date !== null);
-
-    if (parsedDates.length === 0) {
-      return { date: "Invalid date", time: "Invalid time" };
-    }
-
-    const defaultDate = new Date();
-    const startTime = meeting.startTime
-      ? parse(meeting.startTime, "HH:mm", defaultDate)
-      : null;
-    const endTime = meeting.endTime
-      ? parse(meeting.endTime, "HH:mm", defaultDate)
-      : null;
-
-    const formattedDates = parsedDates
-      .map((date) => format(date, "MMM d"))
       .join(", ");
 
-    const formattedTime =
-      startTime && endTime
-        ? `${format(startTime, "h:mm a")} - ${format(endTime, "h:mm a")}`
-        : "TBD";
+    let formattedTime = "TBD";
+    if (meeting.availableSlots && meeting.availableSlots.length > 0) {
+      const slot = meeting.availableSlots[0];
+      const defaultDate = new Date();
+      const startTime = parse(slot.startTime, "HH:mm", defaultDate);
+      const endTime = parse(slot.endTime, "HH:mm", defaultDate);
+      formattedTime = `${format(startTime, "h:mm a")} - ${format(
+        endTime,
+        "h:mm a"
+      )}`;
+    }
 
     return {
       date: formattedDates,

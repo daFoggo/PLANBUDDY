@@ -1,6 +1,6 @@
 import { IMeeting } from "./dashboard";
 
-export interface IMeetingManageForm {
+export interface IMeetingCUForm {
   onClose: () => void;
   meetingData?: IMeeting;
 }

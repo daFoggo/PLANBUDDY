@@ -10,14 +10,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import MeetingMangeForm from "./MeetingManageForm";
+import MeetingMangeForm from "./MeetingCUForm";
 
-import { IMeetingManageDialogProps } from "@/types/meeting-manage-dialog";
+import { IMeetingCUDialogProps } from "@/types/meeting-cu-dialog";
 
-const MeetingManageDialog = ({
+const MeetingCUDialog = ({
   manageType,
   meetingData,
-}: IMeetingManageDialogProps) => {
+}: IMeetingCUDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -52,4 +52,4 @@ const MeetingManageDialog = ({
   );
 };
 
-export default MeetingManageDialog;
+export default MeetingCUDialog;

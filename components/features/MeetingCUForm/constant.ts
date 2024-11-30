@@ -1,0 +1,27 @@
+import { DATE_TYPE, MEETING_TYPE } from "@/components/utils/constant";
+import { z } from "zod";
+
+export const timeOptions = Array.from({ length: 48 }, (_, i) => {
+  const hour = Math.floor(i / 2);
+  const minute = i % 2 === 0 ? "00" : "30";
+  return `${hour.toString().padStart(2, "0")}:${minute}`;
+});
+
+export const steps = ["Basic Infos", "Date & Time"];
+
+export const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+export const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  meetingType: z.enum([MEETING_TYPE.ONLINE, MEETING_TYPE.INPERSON]),
+  location: z.string().optional(),
+  note: z.string().optional(),
+
+  dateType: z.enum([DATE_TYPE.WEEKLY, DATE_TYPE.ANY]),
+  proposedDates: z.array(z.date()).min(1, "At least one date is required"),
+
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  isAllDay: z.boolean().optional(),
+});

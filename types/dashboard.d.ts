@@ -1,45 +1,52 @@
-export interface IMeetingData {
-  stats: IStats;
-  joinedMeeting: IMeeting[];
-  hostedMeeting: IMeeting[];
-}
-
-export interface IStats {
-  arrangingMeeting: number;
-  scheduledMeeting: number;
-  hostedMeeting: number;
-  joinedMeeting: number;
-}
+import {
+  DATE_TYPE,
+  MEETING_STATUS,
+  MEETING_TYPE,
+  PARTICIPANT_ROLE,
+  RESPONSE_STATUS,
+  SLOT_STATUS,
+  USER_TYPE,
+} from "@/components/utils/constant";
 
 export interface IMeeting {
   id: string;
   title: string;
-  meetingType: string;
-  description?: string;
-  location?: string;
-  note?: string;
-  isAllDay?: boolean;
+  description: string?;
+  meetingType: MEETING_TYPE;
+  location: string?;
+  note: string?;
+
+  dateType: DATE_TYPE;
+  proposedDates: Date[];
+  finalDate: Date?;
+
+  status: MEETING_STATUS;
+
+  participants: IMeetingParticipant[];
+  availableSlots: IAvailableSlot[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IMeetingParticipant {
+  id: string;
+  role: PARTICIPANT_ROLE;
+  responseStatus: RESPONSE_STATUS;
+
+  user: IUser;
+  meetingId: string;
+}
+
+export interface IAvailableSlot {
+  id: string;
+  meetingId: string;
+  userId: string;
+
+  date: Date;
   startTime: string;
   endTime: string;
-  status: string;
-  participants: IParticipant[];
-  dateType: string;
-  dateSelections: IDateSelection[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface IParticipant {
-  id: string;
-  role: string;
-  responseStatus: string;
-  user: IUser;
-}
-
-export interface IDateSelection {
-  id: string;
-  isFinal: boolean;
-  date: IDate;
+  timeZone: string;
+  status: SLOT_STATUS;
 }
 
 export interface IUser {
@@ -48,17 +55,22 @@ export interface IUser {
   name: string;
   image: string;
   timeZone: string;
+  userType: USER_TYPE;
+  meetings: IMeeting[];
+  availableSlots: IAvailableSlot[];
 }
 
-export interface IDate {
-  id: string;
-  date: string;
-}
-
-export interface IOverviewProps {
-  overviewData?: IMeetingData;
+export interface IMeetingData {
+  hostedMeeting: IMeeting[];
+  joinedMeeting: IMeeting[];
+  stats: {
+    hostedMeeting: number;
+    joinedMeeting: number;
+    totalMeeting: number;
+    scheduleMeeting: number;
+  };
 }
 
 export interface IMeetingListProps {
-  meetingListData?: IMeeting[];
+  meetingListData: IMeeting[];
 }

@@ -4,7 +4,7 @@ import MobileNav from "./mobile-nav";
 import LoginButton from "@/components/features/Auth/LoginButton";
 import { navItems } from "./constant";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
-import MeetingManageDialog from "@/components/features/MeetingManagement/MeetingManageDialog";
+import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
 import { useAuth } from "@/hooks/use-auth";
 
 const NavBar = () => {
@@ -21,7 +21,7 @@ const NavBar = () => {
       }
       <MobileNav items={navItems} />
       <div className="flex flex-1 items-center justify-end space-x-4">
-        {session ? <MeetingManageDialog manageType="create" /> : null}
+        {session ? <MeetingCUDialog manageType="create" /> : null}
         <ThemeToggle />
         <LoginButton status={status} session={session} />
       </div>

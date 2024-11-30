@@ -4,11 +4,18 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { isSameDay, startOfWeek } from "date-fns";
+import {
+  isSameDay,
+  startOfWeek,
+  addDays,
+  startOfDay,
+  isBefore,
+} from "date-fns";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -33,101 +40,105 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { timeOptions, steps, weekDays, formSchema } from "./constant";
-import { IMeetingManageForm } from "@/types/meeting-manage-form";
-import { addDays } from "@/components/utils/helper/meeting-manage-form";
-import { Loader2 } from "lucide-react";
+import { IMeetingCUForm } from "@/types/meeting-cu-form";
+import {
+  DATE_TYPE,
+  MEETING_STATUS,
+  MEETING_TYPE,
+} from "@/components/utils/constant";
+import { filterCurrentWeekDates, normalizeDate } from "@/components/utils/helper/meeting-cu-form";
 
-const MeetingManageForm = ({ onClose, meetingData }: IMeetingManageForm) => {
+const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   const { session } = useAuth();
   const router = useRouter();
 
   const [step, setStep] = useState(0);
-  const [isAllDay, setIsAllDay] = useState(meetingData?.isAllDay || false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAllDay, setIsAllDay] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: meetingData?.title || "",
-      meetingType: meetingData?.meetingType || "",
+      meetingType: meetingData?.meetingType || MEETING_TYPE.INPERSON,
       description: meetingData?.description || "",
       location: meetingData?.location || "",
       note: meetingData?.note || "",
-      startTime: meetingData?.startTime || "",
-      endTime: meetingData?.endTime || "",
-      dates: meetingData?.dateSelections
-        ? meetingData.dateSelections.map(
-            (selection) => new Date(selection.date.date)
-          )
-        : [],
-      participants: meetingData?.participants
-        ? meetingData.participants.map((participant) => participant.user.id)
-        : session?.user?.id
-        ? [session.user.id]
-        : [],
-      isAllDay: meetingData?.isAllDay || false,
-      dateType: meetingData?.dateType || "specificDates",
+
+      dateType: meetingData?.dateType || DATE_TYPE.WEEKLY,
+      proposedDates: meetingData?.proposedDates || [],
+
+      isAllDay: false,
+      startTime: "08:00",
+      endTime: "19:00",
     },
   });
 
-  // set start and end time if all day is checked
-  useEffect(() => {
-    if (isAllDay) {
-      form.setValue("startTime", "00:00");
-      form.setValue("endTime", "23:30");
-    } else {
-      if (meetingData) {
-        form.setValue("startTime", meetingData.startTime || "");
-        form.setValue("endTime", meetingData.endTime || "");
-      } else {
-        form.setValue("startTime", "");
-        form.setValue("endTime", "");
-      }
-    }
-  }, [isAllDay, form, meetingData]);
-
-  // reset if change from specificDates to thisWeek
-  useEffect(() => {
-    const dateType = form.watch("dateType");
-
-    if (dateType === "thisWeek") {
-      const thisWeekDates = weekDays
-        .map((_, index) => addDays(startOfWeek(new Date()), index))
-        .filter((date) => date >= new Date());
-
-      form.setValue("dates", thisWeekDates);
-    }
-  }, [form.watch("dateType")]);
-
-  //debug form
   useEffect(() => {
     if (form.formState.errors) {
       console.log(form.formState.errors);
     }
   }, [form.formState.errors]);
 
+  const handleDateTypeChange = (dateType: string) => {
+    if (dateType === DATE_TYPE.WEEKLY) {
+      const currentProposedDates = form.getValues("proposedDates");
+      const filteredDates = filterCurrentWeekDates(currentProposedDates);
+      form.setValue("proposedDates", filteredDates);
+    }
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log(session);
+    if (!session?.user?.id) {
+      console.error("No user session found");
+      return;
+    }
+
     setIsLoading(true);
-    const createMeetingData = {
-      ...values,
-      dates: values.dates.map((date) => ({
-        date: date.getTime(),
+
+    const meetingData = {
+      title: values.title,
+      description: values.description,
+      meetingType: values.meetingType,
+      location: values.location,
+      note: values.note,
+      dateType: values.dateType,
+      proposedDates: values.proposedDates.map(normalizeDate),
+      status: MEETING_STATUS.PUBLISHED,
+
+      availableSlots: values.proposedDates.map((date) => ({
+        date: normalizeDate(date),
+        startTime: values.isAllDay ? "00:00" : values.startTime,
+        endTime: values.isAllDay ? "23:30" : values.endTime,
+        timeZone: session.user.timeZone,
       })),
+
+      participants: [
+        {
+          userId: session?.user?.id,
+          role: "OWNER",
+          responseStatus: "ACCEPTED",
+          timeZone: session.user.timeZone,
+        },
+      ],
     };
 
     try {
       const response = await fetch("/api/meeting", {
-        method: meetingData ? "PUT" : "POST",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: meetingData ? JSON.stringify({ ...createMeetingData, id: meetingData.id }) : JSON.stringify(createMeetingData),
+        body: JSON.stringify(meetingData),
       });
+
       if (response.ok) {
         const data = await response.json();
-        router.push(`/meeting/${data.meeting.id}`);
+        router.push(`/meeting?meetingId=${data?.meeting?.id}`);
+        onClose();
       }
-      onClose();
+      console.log("Meeting created successfully:", meetingData);
     } catch (error) {
       console.error("Meeting creation failed:", error);
     } finally {
@@ -188,8 +199,12 @@ const MeetingManageForm = ({ onClose, meetingData }: IMeetingManageForm) => {
                         <SelectValue placeholder="Select meeting type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="online">Online</SelectItem>
-                        <SelectItem value="offline">In-person</SelectItem>
+                        <SelectItem value={MEETING_TYPE.ONLINE}>
+                          Online
+                        </SelectItem>
+                        <SelectItem value={MEETING_TYPE.INPERSON}>
+                          In-person
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -219,14 +234,14 @@ const MeetingManageForm = ({ onClose, meetingData }: IMeetingManageForm) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {form.watch("meetingType") === "online"
+                    {form.watch("meetingType") === MEETING_TYPE.ONLINE
                       ? "Online meeting URL"
                       : "Location"}
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={
-                        form.watch("meetingType") === "online"
+                        form.watch("meetingType") === MEETING_TYPE.ONLINE
                           ? "Enter online meeting URL"
                           : "Enter location"
                       }
@@ -260,19 +275,24 @@ const MeetingManageForm = ({ onClose, meetingData }: IMeetingManageForm) => {
               name="dateType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Time period</FormLabel>
+                  <FormLabel>Date type</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    value={field.value || "specificDates"}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      handleDateTypeChange(value);
+                    }}
+                    value={field.value || DATE_TYPE.WEEKLY}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select time period" />
+                        <SelectValue placeholder="Select date type" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="thisWeek">In this Week</SelectItem>
-                      <SelectItem value="specificDates">Any dates</SelectItem>
+                      <SelectItem value={DATE_TYPE.WEEKLY}>
+                        In this week
+                      </SelectItem>
+                      <SelectItem value={DATE_TYPE.ANY}>Any date</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -280,36 +300,56 @@ const MeetingManageForm = ({ onClose, meetingData }: IMeetingManageForm) => {
             />
             <FormField
               control={form.control}
-              name="dates"
+              name="proposedDates"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Select Dates</FormLabel>
                   <div className="w-full">
-                    {form.watch("dateType") === "thisWeek" ? (
+                    {form.watch("dateType") === DATE_TYPE.WEEKLY ? (
                       <div className="grid grid-cols-7 gap-2">
                         {weekDays.map((day, index) => {
-                          const date = addDays(startOfWeek(new Date()), index);
-                          const isSelected = field.value.some((selectedDate) =>
-                            isSameDay(selectedDate, date)
+                          const weekStart = startOfWeek(new Date(), {
+                            weekStartsOn: 1,
+                          });
+                          const currentDate = addDays(weekStart, index);
+
+                          const isDisabled = isBefore(
+                            currentDate,
+                            startOfDay(new Date())
                           );
-                          const isPastDay = date < new Date();
 
                           return (
                             <Button
-                              type="button"
                               key={day}
-                              variant={isSelected ? "default" : "outline"}
-                              disabled={isPastDay}
+                              type="button"
+                              variant={isDisabled ? "ghost" : "outline"}
                               onClick={() => {
-                                if (!isPastDay) {
-                                  const newDates = isSelected
-                                    ? field.value.filter(
-                                        (d) => !isSameDay(d, date)
-                                      )
-                                    : [...field.value, date];
+                                if (!isDisabled) {
+                                  const currentDates = field.value || [];
+                                  const dateIndex = currentDates.findIndex(
+                                    (d) => isSameDay(d, currentDate)
+                                  );
+
+                                  const newDates =
+                                    dateIndex !== -1
+                                      ? currentDates.filter(
+                                          (d) => !isSameDay(d, currentDate)
+                                        )
+                                      : [...currentDates, currentDate];
+
                                   field.onChange(newDates);
                                 }
                               }}
+                              disabled={isDisabled}
+                              className={cn(
+                                field.value?.some((d) =>
+                                  isSameDay(d, currentDate)
+                                )
+                                  ? "bg-primary text-primary-foreground"
+                                  : "",
+                                isDisabled &&
+                                  "text-muted-foreground cursor-not-allowed"
+                              )}
                             >
                               {day}
                             </Button>
@@ -458,4 +498,4 @@ const MeetingManageForm = ({ onClose, meetingData }: IMeetingManageForm) => {
   );
 };
 
-export default MeetingManageForm;
+export default MeetingCUForm;

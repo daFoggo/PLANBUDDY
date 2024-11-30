@@ -3,6 +3,16 @@ enum UserType {
   GUEST
 }
 
+enum MeetingType {
+  ONLINE
+  INPERSON
+}
+
+enum DateType {
+  WEEKLY 
+  ANY 
+}
+
 enum ParticipantRole {
   OWNER
   PARTICIPANT
@@ -20,4 +30,10 @@ enum MeetingStatus {
   SCHEDULED
   CANCELLED
   COMPLETED
+}
+
+enum SlotStatus {
+  AVAILABLE
+  UNAVAILABLE
+  TENTATIVE
 }

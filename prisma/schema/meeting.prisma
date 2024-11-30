@@ -1,72 +1,56 @@
 model Meeting {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
-  meetingType String
   description String?
+  meetingType MeetingType @default(INPERSON)
   location    String?
   note        String?
-  dateType    String?
-  isAllDay    Boolean  @default(false)
-  startTime   String?
-  endTime     String?
-  status      String   @default("PUBLISHED")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
-  // Relations (1:n)
+  dateType      DateType   @default(WEEKLY)
+  proposedDates DateTime[]
+  finalDate     DateTime?
+
+  status    MeetingStatus @default(PUBLISHED)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
   participants   MeetingParticipant[]
-  dateSelections MeetingDateSelection[]
+  availableSlots AvailableSlot[]
 }
 
 model MeetingParticipant {
-  id             String   @id @default(cuid())
-  role           String // owner/participant
-  responseStatus String   @default("PENDING")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id             String          @id @default(cuid())
+  role           ParticipantRole
+  responseStatus ResponseStatus  @default(PENDING)
 
-  // Relations (n:1)
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
   meetingId String
-  meeting   Meeting @relation(fields: [meetingId], references: [id])
-
-  // Relations (1:n)
-  availabilities AvailableFor[]
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 
   @@unique([userId, meetingId])
   @@index([userId])
   @@index([meetingId])
 }
 
-model MeetingDate {
-  id        String   @id @default(cuid())
-  date      DateTime @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations (1:n)
-  selections MeetingDateSelection[]
-}
-
-model MeetingDateSelection {
-  id        String   @id @default(cuid())
-  isFinal   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations (n:1)
+model AvailableSlot {
+  id        String  @id @default(cuid())
   meetingId String
-  meeting   Meeting @relation(fields: [meetingId], references: [id])
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 
-  dateId String
-  date   MeetingDate @relation(fields: [dateId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relations (1:n)
-  availabilities AvailableFor[]
+  date      DateTime
+  startTime DateTime
+  endTime   DateTime
+  status    SlotStatus @default(AVAILABLE)
 
-  @@unique([meetingId, dateId])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([meetingId])
-  @@index([dateId])
+  @@index([userId])
+  @@index([date])
 }

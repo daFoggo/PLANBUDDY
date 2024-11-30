@@ -1,0 +1,39 @@
+export enum USER_TYPE {
+  GOOGLE_USER,
+  GUEST,
+}
+
+export enum MEETING_TYPE {
+  ONLINE,
+  INPERSON,
+}
+
+export enum DATE_TYPE {
+  WEEKLY,
+  ANY,
+}
+
+export enum PARTICIPANT_ROLE {
+  OWNER,
+  PARTICIPANT,
+}
+
+export enum RESPONSE_STATUS {
+  PENDING,
+  ACCEPTED,
+  DECLINED,
+  TENTATIVE,
+}
+
+export enum MEETING_STATUS {
+  PUBLISHED,
+  SCHEDULED,
+  CANCELLED,
+  COMPLETED,
+}
+
+export enum SLOT_STATUS {
+  AVAILABLE,
+  UNAVAILABLE,
+  TENTATIVE,
+}

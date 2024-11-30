@@ -9,11 +9,10 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-
-  // Relations (1:n)
-  participations MeetingParticipant[]
+  accounts       Account[]
+  sessions       Session[]
+  meetings       MeetingParticipant[]
+  availableSlots AvailableSlot[]
 
   @@index([email])
 }

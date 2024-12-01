@@ -32,10 +32,13 @@ export const formatMeetingDateTime = (meeting: IMeeting) => {
       const defaultDate = new Date();
       const startTime = parse(slot.startTime, "HH:mm", defaultDate);
       const endTime = parse(slot.endTime, "HH:mm", defaultDate);
-      formattedTime = `${format(startTime, "h:mm a")} - ${format(
-        endTime,
-        "h:mm a"
-      )}`;
+      const formattedStart = format(startTime, "h:mm a");
+      const formattedEnd = format(endTime, "h:mm a");
+      if (formattedStart === "12:00 AM" && formattedEnd === "11:30 PM") {
+        formattedTime = "All Day";
+      } else {
+        formattedTime = `${formattedStart} - ${formattedEnd}`;
+      }
     }
 
     return {

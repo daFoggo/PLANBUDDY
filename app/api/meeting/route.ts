@@ -265,3 +265,129 @@ export async function POST(req: NextRequest) {
     await prisma.$disconnect();
   }
 }
+
+export async function PUT(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const meetingUpdateData = await req.json();
+
+    if (!meetingUpdateData.id) {
+      return NextResponse.json(
+        { error: "Meeting ID is required" }, 
+        { status: 400 }
+      );
+    }
+
+    // check owner permission
+    const existingMeeting = await prisma.meeting.findUnique({
+      where: { id: meetingUpdateData.id },
+      include: { 
+        participants: {
+          where: { 
+            userId: session.user.id,
+            role: PARTICIPANT_ROLE.OWNER 
+          }
+        }
+      }
+    });
+
+    if (!existingMeeting || existingMeeting.participants.length === 0) {
+      return NextResponse.json(
+        { error: "You do not have permission to update this meeting" }, 
+        { status: 403 }
+      );
+    }
+
+    const updateData: any = {
+      ...(meetingUpdateData.title && { title: meetingUpdateData.title }),
+      ...(meetingUpdateData.description !== undefined && { description: meetingUpdateData.description }),
+      ...(meetingUpdateData.meetingType && { meetingType: meetingUpdateData.meetingType }),
+      ...(meetingUpdateData.location !== undefined && { location: meetingUpdateData.location }),
+      ...(meetingUpdateData.note !== undefined && { note: meetingUpdateData.note }),
+      ...(meetingUpdateData.dateType && { dateType: meetingUpdateData.dateType }),
+      ...(meetingUpdateData.proposedDates && { 
+        proposedDates: meetingUpdateData.proposedDates.map((date: string) => new Date(date)) 
+      }),
+      ...(meetingUpdateData.status && { status: meetingUpdateData.status }),
+    };
+
+    // Update meeting
+    const updatedMeeting = await prisma.meeting.update({
+      where: { id: meetingUpdateData.id },
+      data: updateData,
+      include: {
+        participants: true,
+        availableSlots: true,
+      },
+    });
+
+    // update participants 
+    if (meetingUpdateData.participants) {
+      await prisma.meetingParticipant.deleteMany({
+        where: { meetingId: meetingUpdateData.id }
+      });
+
+      await prisma.meetingParticipant.createMany({
+        data: [
+          {
+            userId: session.user.id,
+            meetingId: meetingUpdateData.id,
+            role: PARTICIPANT_ROLE.OWNER,
+          },
+          ...(meetingUpdateData.participants || [])
+            .filter(
+              (participant: { userId: string }) =>
+                participant.userId !== session.user.id
+            )
+            .map((participant: any) => ({
+              userId: participant.userId,
+              meetingId: meetingUpdateData.id,
+              role: participant.role || PARTICIPANT_ROLE.PARTICIPANT,
+            })),
+        ],
+      });
+    }
+
+    // update slots
+    if (meetingUpdateData.availableSlots) {
+      await prisma.availableSlot.deleteMany({
+        where: { meetingId: meetingUpdateData.id }
+      });
+
+      const newSlots = await prisma.availableSlot.createMany({
+        data: meetingUpdateData.availableSlots.map((slot: any) => ({
+          meetingId: meetingUpdateData.id,
+          userId: session.user.id,
+          date: new Date(slot.date),
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          timeZone: slot.timeZone,
+        })),
+      });
+    }
+
+    return NextResponse.json(
+      { 
+        meeting: updatedMeeting,
+        message: "Meeting updated successfully" 
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating meeting:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to update meeting",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}

@@ -46,7 +46,10 @@ import {
   MEETING_STATUS,
   MEETING_TYPE,
 } from "@/components/utils/constant";
-import { filterCurrentWeekDates, normalizeDate } from "@/components/utils/helper/meeting-cu-form";
+import {
+  filterCurrentWeekDates,
+  normalizeDate,
+} from "@/components/utils/helper/meeting-cu-form";
 
 const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   const { session } = useAuth();
@@ -66,17 +69,29 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
       note: meetingData?.note || "",
 
       dateType: meetingData?.dateType || DATE_TYPE.WEEKLY,
-      proposedDates: meetingData?.proposedDates || [],
-
-      isAllDay: false,
-      startTime: "08:00",
-      endTime: "19:00",
+      proposedDates: meetingData?.proposedDates
+        ? meetingData.proposedDates.map((date) => new Date(date))
+        : [],
+      startTime: meetingData?.availableSlots[0].startTime || "08:00",
+      endTime: meetingData?.availableSlots[0].endTime || "19:00",
     },
   });
 
+  // compare form value to set isAllDay
+  useEffect(() => {
+    if (meetingData) {
+      const isAllDay =
+        meetingData.availableSlots[0].startTime === "00:00" &&
+        meetingData.availableSlots[0].endTime === "23:30";
+      setIsAllDay(isAllDay);
+    }
+  }, [meetingData]);
+
+  //debug form
   useEffect(() => {
     if (form.formState.errors) {
       console.log(form.formState.errors);
+      console.log(meetingData);
     }
   }, [form.formState.errors]);
 
@@ -97,7 +112,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
 
     setIsLoading(true);
 
-    const meetingData = {
+    const createMeetingData = {
       title: values.title,
       description: values.description,
       meetingType: values.meetingType,
@@ -126,19 +141,21 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
 
     try {
       const response = await fetch("/api/meeting", {
-        method: "POST",
+        method: meetingData ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(meetingData),
+        body: meetingData
+          ? JSON.stringify({ ...createMeetingData, id: meetingData.id })
+          : JSON.stringify(createMeetingData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        router.push(`/meeting?meetingId=${data?.meeting?.id}`);
+        console.log(data.meeting);
+        router.push(`/meeting/${data.meeting.id}`);
         onClose();
       }
-      console.log("Meeting created successfully:", meetingData);
     } catch (error) {
       console.error("Meeting creation failed:", error);
     } finally {
@@ -359,7 +376,15 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
                     ) : (
                       <Calendar
                         mode="multiple"
-                        selected={field.value}
+                        selected={
+                          field.value.length > 0
+                            ? field.value.map((date) => new Date(date))
+                            : meetingData?.proposedDates
+                            ? meetingData.proposedDates.map(
+                                (date) => new Date(date)
+                              )
+                            : []
+                        }
                         onSelect={field.onChange}
                         className="rounded-md border w-full"
                         disabled={(date) => date < new Date()}

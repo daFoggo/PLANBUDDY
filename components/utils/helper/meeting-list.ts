@@ -4,13 +4,13 @@ import { IMeeting } from "@/types/dashboard";
 export const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
     case "published":
-      return "bg-green-400 border-green-600 dark:bg-green-700 dark:border-green-500";
+      return "bg-green-400 border-green-600 dark:bg-green-700 dark:border-green-500 hover:bg-green-500 hover:border-green-700 dark:hover:bg-green-600 dark:hover:border-green-400";
     case "draft":
-      return "bg-yellow-400 border-yellow-600 dark:bg-yellow-700 dark:border-yellow-500 ";
+      return "bg-yellow-400 border-yellow-600 dark:bg-yellow-700 dark:border-yellow-500 hover:bg-yellow-500 hover:border-yellow-700 dark:hover:bg-yellow-600 dark:hover:border-yellow-400";
     case "cancelled":
-      return "bg-red-400 border-red-600 dark:bg-red-700 dark:border-red-500";
+      return "bg-red-400 border-red-600 dark:bg-red-700 dark:border-red-500 hover:bg-red-500 hover:border-red-700 dark:hover:bg-red-600 dark:hover:border-red-400";
     default:
-      return "bg-gray-400 border-gray-600 dark:bg-gray-700 dark:border-gray-500";
+      return "bg-gray-400 border-gray-600 dark:bg-gray-700 dark:border-gray-500 hover:bg-gray-500 hover:border-gray-700 dark:hover:bg-gray-600 dark:hover:border-gray-400";
   }
 };
 

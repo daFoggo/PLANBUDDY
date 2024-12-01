@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
 import { headers } from "next/headers";
+import MeetingDelete from "@/components/features/MeetingCUForm/MeetingDelete";
 
 const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
   try {
@@ -103,7 +104,10 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
                 </div>
               </CardDescription>
             </div>
-            <MeetingCUDialog manageType="edit" meetingData={meeting} />
+            <div className="space-x-2 flex items-center">
+              <MeetingDelete meetingId={params.meetingId} />
+              <MeetingCUDialog manageType="edit" meetingData={meeting} />
+            </div>
           </CardHeader>
           <CardContent className="flex items-center space-x-4 p-0"></CardContent>
         </Card>

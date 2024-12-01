@@ -56,7 +56,7 @@ export default function RootLayout({
               <main className="flex-1 p-6 w-full">{children}</main>
               <Footer />
             </div>
-            <Toaster />
+            <Toaster position="top-center" />
           </ThemeProvider>
         </SessionProvider>
       </body>

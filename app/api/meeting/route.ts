@@ -277,7 +277,7 @@ export async function PUT(req: NextRequest) {
 
     if (!meetingUpdateData.id) {
       return NextResponse.json(
-        { error: "Meeting ID is required" }, 
+        { error: "Meeting ID is required" },
         { status: 400 }
       );
     }
@@ -285,32 +285,44 @@ export async function PUT(req: NextRequest) {
     // check owner permission
     const existingMeeting = await prisma.meeting.findUnique({
       where: { id: meetingUpdateData.id },
-      include: { 
+      include: {
         participants: {
-          where: { 
+          where: {
             userId: session.user.id,
-            role: PARTICIPANT_ROLE.OWNER 
-          }
-        }
-      }
+            role: PARTICIPANT_ROLE.OWNER,
+          },
+        },
+      },
     });
 
     if (!existingMeeting || existingMeeting.participants.length === 0) {
       return NextResponse.json(
-        { error: "You do not have permission to update this meeting" }, 
+        { error: "You do not have permission to update this meeting" },
         { status: 403 }
       );
     }
 
     const updateData: any = {
       ...(meetingUpdateData.title && { title: meetingUpdateData.title }),
-      ...(meetingUpdateData.description !== undefined && { description: meetingUpdateData.description }),
-      ...(meetingUpdateData.meetingType && { meetingType: meetingUpdateData.meetingType }),
-      ...(meetingUpdateData.location !== undefined && { location: meetingUpdateData.location }),
-      ...(meetingUpdateData.note !== undefined && { note: meetingUpdateData.note }),
-      ...(meetingUpdateData.dateType && { dateType: meetingUpdateData.dateType }),
-      ...(meetingUpdateData.proposedDates && { 
-        proposedDates: meetingUpdateData.proposedDates.map((date: string) => new Date(date)) 
+      ...(meetingUpdateData.description !== undefined && {
+        description: meetingUpdateData.description,
+      }),
+      ...(meetingUpdateData.meetingType && {
+        meetingType: meetingUpdateData.meetingType,
+      }),
+      ...(meetingUpdateData.location !== undefined && {
+        location: meetingUpdateData.location,
+      }),
+      ...(meetingUpdateData.note !== undefined && {
+        note: meetingUpdateData.note,
+      }),
+      ...(meetingUpdateData.dateType && {
+        dateType: meetingUpdateData.dateType,
+      }),
+      ...(meetingUpdateData.proposedDates && {
+        proposedDates: meetingUpdateData.proposedDates.map(
+          (date: string) => new Date(date)
+        ),
       }),
       ...(meetingUpdateData.status && { status: meetingUpdateData.status }),
     };
@@ -325,10 +337,10 @@ export async function PUT(req: NextRequest) {
       },
     });
 
-    // update participants 
+    // update participants
     if (meetingUpdateData.participants) {
       await prisma.meetingParticipant.deleteMany({
-        where: { meetingId: meetingUpdateData.id }
+        where: { meetingId: meetingUpdateData.id },
       });
 
       await prisma.meetingParticipant.createMany({
@@ -355,7 +367,7 @@ export async function PUT(req: NextRequest) {
     // update slots
     if (meetingUpdateData.availableSlots) {
       await prisma.availableSlot.deleteMany({
-        where: { meetingId: meetingUpdateData.id }
+        where: { meetingId: meetingUpdateData.id },
       });
 
       const newSlots = await prisma.availableSlot.createMany({
@@ -371,9 +383,9 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
+      {
         meeting: updatedMeeting,
-        message: "Meeting updated successfully" 
+        message: "Meeting updated successfully",
       },
       { status: 200 }
     );
@@ -383,6 +395,78 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(
       {
         error: "Failed to update meeting",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const meetingId = searchParams.get("meetingId");
+
+    if (!meetingId) {
+      return NextResponse.json(
+        { error: "Meeting ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const existingMeeting = await prisma.meeting.findUnique({
+      where: { id: meetingId },
+      include: {
+        participants: {
+          where: {
+            userId: session.user.id,
+            role: PARTICIPANT_ROLE.OWNER,
+          },
+        },
+      },
+    });
+
+    if (!existingMeeting || existingMeeting.participants.length === 0) {
+      return NextResponse.json(
+        { error: "You do not have permission to delete this meeting" },
+        { status: 403 }
+      );
+    }
+
+    // Delete linked slots
+    await prisma.availableSlot.deleteMany({
+      where: { meetingId: meetingId },
+    });
+
+    // Delete linked participants
+    await prisma.meetingParticipant.deleteMany({
+      where: { meetingId: meetingId },
+    });
+
+    // Delete meeting
+    await prisma.meeting.delete({
+      where: { id: meetingId },
+    });
+
+    return NextResponse.json(
+      {
+        message: "Meeting deleted successfully",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting meeting:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to delete meeting",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }

@@ -1,9 +1,64 @@
+"use client";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
+const MeetingDelete = ({ meetingId }: { meetingId: string }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-const MeetingDelete = () => {
+  const handleDelete = async () => {
+    setIsLoading(true);
+    try {
+      await fetch(`/api/meeting?meetingId=${meetingId}`, {
+        method: "DELETE",
+      });
 
-  return <Button>Delete</Button>;
-
+      setIsLoading(false);
+      toast.success("Meeting deleted successfully");
+      router.push("/dashboard/");
+    } catch (error) {
+      console.error("Error deleting meeting:", error);
+      toast.error("Error deleting meeting");
+    }
+  };
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          className="border-red-500 bg-red-500/10 text-red-500 hover:bg-red-500/30 hover:border-red-600 hover:text-red-600"
+        >
+          <Trash2 className="size-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+        <DialogTitle>Delete confirm</DialogTitle>
+        <p>Are you sure you want to delete this meeting?</p>
+        <DialogFooter>
+          <Button variant="outline">Cancel</Button>
+          <Button variant="destructive" onClick={handleDelete} type="submit">
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              "Delete"
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 export default MeetingDelete;

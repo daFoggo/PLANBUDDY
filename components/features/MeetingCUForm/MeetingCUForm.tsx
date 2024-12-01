@@ -50,6 +50,7 @@ import {
   filterCurrentWeekDates,
   normalizeDate,
 } from "@/components/utils/helper/meeting-cu-form";
+import { toast } from "sonner";
 
 const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   const { session } = useAuth();
@@ -155,9 +156,15 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
         console.log(data.meeting);
         router.push(`/meeting/${data.meeting.id}`);
         onClose();
+        meetingData
+          ? toast.success("Meeting updated successfully")
+          : toast.success("Meeting created successfully");
       }
     } catch (error) {
       console.error("Meeting creation failed:", error);
+      meetingData
+        ? toast.error("Error updating meeting")
+        : toast.error("Error creating meeting");
     } finally {
       setIsLoading(false);
     }

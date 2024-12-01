@@ -1,12 +1,9 @@
 import { notFound } from "next/navigation";
-import PageTitle from "@/components/common/PageTitle";
+import { headers } from "next/headers";
+
 import { Calendar, CalendarSearch, Clock, Users } from "lucide-react";
-import { IMeeting } from "@/types/dashboard";
+import PageTitle from "@/components/common/PageTitle";
 import { Badge } from "@/components/ui/badge";
-import {
-  formatMeetingDateTime,
-  getStatusColor,
-} from "@/components/utils/helper/meeting-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -18,8 +15,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
-import { headers } from "next/headers";
 import MeetingDelete from "@/components/features/MeetingCUForm/MeetingDelete";
+import MeetingCopy from "@/components/features/MeetingCUForm/MeetingCopy";
+import AvailabilityGrid from "@/components/features/AvailabilityFill/AvailabilityGrid";
+import {
+  formatMeetingDateTime,
+  getStatusColor,
+} from "@/components/utils/helper/meeting-list";
+import { IMeeting } from "@/types/dashboard";
+import AvailabilityChoose from "@/components/features/AvailabilityFill/AvailabilityChoose";
 
 const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
   try {
@@ -105,12 +109,20 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
               </CardDescription>
             </div>
             <div className="space-x-2 flex items-center">
+              <MeetingCopy meetingId={params.meetingId} />
               <MeetingDelete meetingId={params.meetingId} />
               <MeetingCUDialog manageType="edit" meetingData={meeting} />
             </div>
           </CardHeader>
-          <CardContent className="flex items-center space-x-4 p-0"></CardContent>
+          <CardContent className="flex items-center space-x-4 p-0">
+            
+          </CardContent>
         </Card>
+
+        <div className="grid grid-cols-3 gap-4">
+          <AvailabilityGrid />
+          <AvailabilityChoose />
+        </div>
       </div>
     );
   } catch (error) {

@@ -1,7 +1,7 @@
 "use client";
 import { toast } from "sonner";
 
-import {Link } from "lucide-react";
+import { Link } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 const MeetingCopy = ({ meetingId }: { meetingId: string }) => {
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(

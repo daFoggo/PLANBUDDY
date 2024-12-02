@@ -12,6 +12,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const UserMenu = ({ session }: any) => {
   return (
@@ -56,7 +57,9 @@ const UserMenu = ({ session }: any) => {
           Settings
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()}>
+        <DropdownMenuItem onClick={() => {
+          signOut({redirectTo: "/"});
+          }}>
           <LogOut className="w-4 h-4 mr-2" />
           Log out
         </DropdownMenuItem>

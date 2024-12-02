@@ -7,14 +7,6 @@ const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
   try {
-    // comment if you need to test api on postman
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      console.log("No session user ID"); // Add this
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
     const meetingId = searchParams.get("meetingId");
@@ -60,6 +52,13 @@ export async function GET(req: NextRequest) {
 
     // fetch meetings data of user
     if (userId) {
+      // comment if you need to test api on postman
+      const session = await auth();
+
+      if (!session?.user?.id) {
+        console.log("No session user ID");
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
       try {
         const [hostedMeeting, joinedMeeting, stats] = await Promise.all([
           // hosted meeting
@@ -405,73 +404,114 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session || !session.user || !session.user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const session = await auth();
+  if (!session || !session.user || !session.user.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    const { searchParams } = new URL(req.url);
-    const meetingId = searchParams.get("meetingId");
+  const { searchParams } = new URL(req.url);
+  const meetingId = searchParams.get("meetingId");
+  const participantId = searchParams.get("participantId");
 
-    if (!meetingId) {
-      return NextResponse.json(
-        { error: "Meeting ID is required" },
-        { status: 400 }
-      );
-    }
-
-    const existingMeeting = await prisma.meeting.findUnique({
-      where: { id: meetingId },
-      include: {
-        participants: {
-          where: {
-            userId: session.user.id,
-            role: PARTICIPANT_ROLE.OWNER,
+  if (meetingId) {
+    try {
+      const existingMeeting = await prisma.meeting.findUnique({
+        where: { id: meetingId },
+        include: {
+          participants: {
+            where: {
+              userId: session.user.id,
+              role: PARTICIPANT_ROLE.OWNER,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!existingMeeting || existingMeeting.participants.length === 0) {
+      if (!existingMeeting || existingMeeting.participants.length === 0) {
+        return NextResponse.json(
+          { error: "You do not have permission to delete this meeting" },
+          { status: 403 }
+        );
+      }
+
+      // Delete linked slots
+      await prisma.availableSlot.deleteMany({
+        where: { meetingId: meetingId },
+      });
+
+      // Delete linked participants
+      await prisma.meetingParticipant.deleteMany({
+        where: { meetingId: meetingId },
+      });
+
+      // Delete meeting
+      await prisma.meeting.delete({
+        where: { id: meetingId },
+      });
+
       return NextResponse.json(
-        { error: "You do not have permission to delete this meeting" },
-        { status: 403 }
+        {
+          message: "Meeting deleted successfully",
+        },
+        { status: 200 }
+      );
+    } catch (error) {
+      console.error("Error deleting meeting:", error);
+
+      return NextResponse.json(
+        {
+          error: "Failed to delete meeting",
+          details: error instanceof Error ? error.message : "Unknown error",
+        },
+        { status: 500 }
+      );
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  if (participantId && meetingId) {
+    try {
+      const existingMeeting = await prisma.meeting.findUnique({
+        where: { id: meetingId },
+        include: {
+          participants: {
+            where: {
+              userId: session.user.id,
+              role: PARTICIPANT_ROLE.OWNER,
+            },
+          },
+        },
+      });
+
+      if (!existingMeeting || existingMeeting.participants.length === 0) {
+        return NextResponse.json(
+          { error: "You do not have permission to delete this participant" },
+          { status: 403 }
+        );
+      }
+
+      // Delete participant
+      await prisma.meetingParticipant.delete({
+        where: { id: participantId },
+      });
+
+      return NextResponse.json(
+        {
+          message: "Participant deleted successfully",
+        },
+        { status: 200 }
+      );
+    } catch (error) {
+      console.error("Error deleting participant:", error);
+
+      return NextResponse.json(
+        {
+          error: "Failed to delete participant",
+          details: error instanceof Error ? error.message : "Unknown error",
+        },
+        { status: 500 }
       );
     }
-
-    // Delete linked slots
-    await prisma.availableSlot.deleteMany({
-      where: { meetingId: meetingId },
-    });
-
-    // Delete linked participants
-    await prisma.meetingParticipant.deleteMany({
-      where: { meetingId: meetingId },
-    });
-
-    // Delete meeting
-    await prisma.meeting.delete({
-      where: { id: meetingId },
-    });
-
-    return NextResponse.json(
-      {
-        message: "Meeting deleted successfully",
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error deleting meeting:", error);
-
-    return NextResponse.json(
-      {
-        error: "Failed to delete meeting",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
   }
 }

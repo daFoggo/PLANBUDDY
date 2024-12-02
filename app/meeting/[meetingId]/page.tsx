@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -24,9 +23,12 @@ import {
 } from "@/components/utils/helper/meeting-list";
 import { IMeeting } from "@/types/dashboard";
 import AvailabilityChoose from "@/components/features/AvailabilityFill/AvailabilityChoose";
+import { auth } from "@/app/api/auth/[...nextauth]/route";
 
 const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SITE_URL}/api/meeting?meetingId=${params.meetingId}`,
       {
@@ -42,6 +44,10 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
     }
     const data = await response.json();
     const meeting: IMeeting = { ...data.meeting, id: params.meetingId };
+    
+    const isOwner = meeting.participants.some(
+      (participant) => participant.userId === userId && participant.role === "OWNER"
+    );
 
     const { date, time } = formatMeetingDateTime(meeting);
 
@@ -110,18 +116,20 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
             </div>
             <div className="space-x-2 flex items-center">
               <MeetingCopy meetingId={params.meetingId} />
-              <MeetingDelete meetingId={params.meetingId} />
-              <MeetingCUDialog manageType="edit" meetingData={meeting} />
+              <MeetingDelete meetingId={params.meetingId} isOwner={isOwner} />
+              <MeetingCUDialog
+                manageType="edit"
+                meetingData={meeting}
+                isOwner={isOwner}
+              />
             </div>
           </CardHeader>
-          <CardContent className="flex items-center space-x-4 p-0">
-            
-          </CardContent>
+          <CardContent className="flex items-center space-x-4 p-0"></CardContent>
         </Card>
 
         <div className="grid grid-cols-3 gap-4">
-          <AvailabilityGrid />
-          <AvailabilityChoose />
+          <AvailabilityGrid meeting={meeting} isOwner={isOwner} />
+          <AvailabilityChoose meeting={meeting} isOwner={isOwner} />
         </div>
       </div>
     );

@@ -16,6 +16,7 @@ import UserMenu from "./UserMenu";
 import GuestLoginForm from "./GuestLoginForm";
 
 import { ILoginButtonProps } from "@/types/login-button";
+import LoginDialogContent from "./LoginDialogContent";
 
 const LoginButton = ({ status, session }: ILoginButtonProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -36,34 +37,7 @@ const LoginButton = ({ status, session }: ILoginButtonProps) => {
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="w-[95%] sm:w-[425px] rounded-lg"
         >
-          <DialogHeader>
-            <DialogTitle className="text-xl">Login</DialogTitle>
-            <DialogDescription>
-              Start login to use our application
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-4">
-            <GuestLoginForm onClose={() => setIsDialogOpen(false)} />
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-sm font-semibold">
-                <span className="bg-background px-2 text-muted-foreground">
-                  OR
-                </span>
-              </div>
-            </div>
-
-            <Button
-              onClick={() => signIn("google")}
-              className="w-full"
-              variant="outline"
-            >
-              <FaGoogle className="size-4" />
-              Continue with Google
-            </Button>
-          </div>
+          <LoginDialogContent setIsDialogOpen={setIsDialogOpen} />
         </DialogContent>
       </Dialog>
     );

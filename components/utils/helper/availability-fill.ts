@@ -6,19 +6,24 @@ export const getStatusColor = (
 ) => {
   const baseColors = {
     [SLOT_STATUS.AVAILABLE]: {
-      drag: "bg-green-500/40 dark:bg-green-500/30",
-      base: "bg-green-500/60 dark:bg-green-500/50",
+      drag: "bg-green-500/50",
+      base: "bg-green-500/70 dark:bg-green-500/80",
     },
     [SLOT_STATUS.TENTATIVE]: {
-      drag: "bg-yellow-500/40 dark:bg-yellow-500/30",
-      base: "bg-yellow-500/60 dark:bg-yellow-500/50",
+      drag: "bg-yellow-500/50",
+      base: "bg-yellow-500/70 dark:bg-yellow-500/80",
     },
     [SLOT_STATUS.UNAVAILABLE]: {
-      drag: "bg-red-500/40 dark:bg-red-500/30",
-      base: "bg-red-500/60 dark:bg-red-500/50",
+      drag: "bg-red-500/50",
+      base: "bg-red-500/70 dark:bg-red-500/80",
     },
   };
 
   const colorSet = baseColors[status];
   return inDragSelection ? colorSet.drag : colorSet.base;
+};
+
+export const getHourDecimal = (timeString: string): number => {
+  const [hours, minutes] = timeString.split(":");
+  return Number(hours) + Number(minutes) / 60;
 };

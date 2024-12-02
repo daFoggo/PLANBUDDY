@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { addDays, format, startOfWeek } from "date-fns";
 import { cn } from "@/lib/utils";
 
-import { Pencil, Save } from "lucide-react";
+import { Pencil, Save, SquarePlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,10 +19,25 @@ import {
 import { SLOT_STATUS } from "@/components/utils/constant";
 
 import { ITimeSlot } from "@/types/availability-fill";
-import { getStatusColor } from "@/components/utils/helper/availability-fill";
+import {
+  getHourDecimal,
+  getStatusColor,
+} from "@/components/utils/helper/availability-fill";
+import { useAuth } from "@/hooks/use-auth";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import LoginDialogContent from "../Auth/LoginDialogContent";
+import { IMeeting } from "@/types/dashboard";
 
-const AvailabilityGrid = () => {
+const AvailabilityGrid = ({
+  meeting,
+  isOwner,
+}: {
+  meeting: IMeeting;
+  isOwner: boolean;
+}) => {
+  const { status } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<SLOT_STATUS>(
     SLOT_STATUS.AVAILABLE
   );
@@ -36,10 +51,14 @@ const AvailabilityGrid = () => {
   );
   const [date, setDate] = useState<Date>(new Date());
 
+  // caculate time slots  
   const timeSlots: ITimeSlot[] = useMemo(() => {
     const slots = [];
-    for (let hour = 9; hour <= 16; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
+    const startHour = getHourDecimal(meeting.availableSlots[0].startTime);
+    const endHour = getHourDecimal(meeting.availableSlots[0].endTime);
+
+    for (let hour = startHour; hour < endHour; hour++) {
+      for (let minute of [0, 30]) {
         slots.push({
           time: format(new Date().setHours(hour, minute), "HH:mm"),
           status: [
@@ -50,8 +69,20 @@ const AvailabilityGrid = () => {
         });
       }
     }
+
+    if (endHour % 1 === 0) {
+      slots.push({
+        time: format(new Date().setHours(endHour, 0), "HH:mm"),
+        status: [
+          SLOT_STATUS.UNAVAILABLE,
+          SLOT_STATUS.UNAVAILABLE,
+          SLOT_STATUS.UNAVAILABLE,
+        ],
+      });
+    }
+
     return slots;
-  }, []);
+  }, [meeting.availableSlots]);
 
   const [availability, setAvailability] = useState<ITimeSlot[]>(timeSlots);
 
@@ -79,7 +110,7 @@ const AvailabilityGrid = () => {
       case SLOT_STATUS.UNAVAILABLE:
         return selectedStatus;
       default:
-        return SLOT_STATUS.UNAVAILABLE;
+        return SLOT_STATUS.UNAVAILABLE
     }
   };
 
@@ -141,10 +172,21 @@ const AvailabilityGrid = () => {
         <CardTitle>Fill your availability</CardTitle>
         <div className="flex items-center space-x-2">
           {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit your availability
-            </Button>
+            status === "authenticated" ? (
+              <Button onClick={() => setIsEditing(true)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit your availability
+              </Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  setIsDialogOpen(true);
+                }}
+              >
+                <SquarePlus className="mr-2 h-4 w-4" />
+                Add your availability
+              </Button>
+            )
           ) : (
             <div className="flex items-center space-x-2">
               <Button
@@ -271,6 +313,14 @@ const AvailabilityGrid = () => {
           </div>
         </div>
       </CardContent>
+      <Dialog open={isDialogOpen}>
+        <DialogContent
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="w-[95%] sm:w-[425px] rounded-lg"
+        >
+          <LoginDialogContent setIsDialogOpen={setIsDialogOpen} />
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

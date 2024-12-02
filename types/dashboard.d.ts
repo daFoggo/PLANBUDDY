@@ -33,6 +33,7 @@ export interface IMeetingParticipant {
   role: PARTICIPANT_ROLE;
   responseStatus: RESPONSE_STATUS;
 
+  userId: string | undefined;
   user: IUser;
   meetingId: string;
 }

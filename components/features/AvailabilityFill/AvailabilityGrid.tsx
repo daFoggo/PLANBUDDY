@@ -20,6 +20,7 @@ import { SLOT_STATUS } from "@/components/utils/constant";
 
 import { ITimeSlot } from "@/types/availability-fill";
 import {
+  determineOverallStatus,
   getHourDecimal,
   getStatusColor,
 } from "@/components/utils/helper/availability-fill";
@@ -27,15 +28,15 @@ import { useAuth } from "@/hooks/use-auth";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import LoginDialogContent from "../Auth/LoginDialogContent";
 import { IMeeting } from "@/types/dashboard";
+import { toast } from "sonner";
 
 const AvailabilityGrid = ({
   meeting,
-  isOwner,
 }: {
   meeting: IMeeting;
   isOwner: boolean;
 }) => {
-  const { status } = useAuth();
+  const { status, session } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<SLOT_STATUS>(
@@ -50,8 +51,9 @@ const AvailabilityGrid = ({
     null
   );
   const [date, setDate] = useState<Date>(new Date());
+  const [isSaving, setIsSaving] = useState(false);
 
-  // caculate time slots  
+  // caculate time slots
   const timeSlots: ITimeSlot[] = useMemo(() => {
     const slots = [];
     const startHour = getHourDecimal(meeting.availableSlots[0].startTime);
@@ -86,8 +88,55 @@ const AvailabilityGrid = ({
 
   const [availability, setAvailability] = useState<ITimeSlot[]>(timeSlots);
 
-  const weekStart = startOfWeek(date);
-  const days = [0, 1, 2].map((offset) => addDays(weekStart, offset));
+  const handleSaveAvailability = async () => {
+    if (!session) return;
+
+    setIsSaving(true);
+
+    // Prepare available slots data
+    const availableSlots = meeting.proposedDates.map((day, dayIndex) => {
+      // For each time slot, filter the status for this specific day
+      const dayStatuses = availability.map((slot) => slot.status[dayIndex]);
+
+      return {
+        date: day,
+        startTime: meeting.availableSlots[0].startTime,
+        endTime: meeting.availableSlots[0].endTime,
+        status: determineOverallStatus(dayStatuses), // Determine single status
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+    });
+
+    try {
+      const response = await fetch(`/api/meeting?meetingId=${meeting.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          meetingId: meeting.id,
+          userId: session.user.id,
+          availableSlots: availableSlots,
+          responseStatus: "ACCEPTED", 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to save availability");
+      }
+
+      toast.success("Updated your availability successfully");
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving availability:", error);
+      toast.success("Failed to update your availability");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleMouseDown = (rowIndex: number, colIndex: number) => {
     if (!isEditing) return;
@@ -110,7 +159,7 @@ const AvailabilityGrid = ({
       case SLOT_STATUS.UNAVAILABLE:
         return selectedStatus;
       default:
-        return SLOT_STATUS.UNAVAILABLE
+        return SLOT_STATUS.UNAVAILABLE;
     }
   };
 
@@ -199,9 +248,15 @@ const AvailabilityGrid = ({
               >
                 Cancel
               </Button>
-              <Button onClick={() => setIsEditing(false)}>
-                <Save className="mr-2 h-4 w-4" />
-                Save
+              <Button onClick={handleSaveAvailability} disabled={isSaving}>
+                {isSaving ? (
+                  "Saving..."
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save
+                  </>
+                )}
               </Button>
             </div>
           )}
@@ -267,7 +322,7 @@ const AvailabilityGrid = ({
         >
           <div className="grid grid-cols-[80px_1fr_1fr_1fr] border-b bg-muted dark:bg-background">
             <div className="p-2 font-medium text-center"></div>
-            {days.map((day, index) => (
+            {meeting.proposedDates.map((day, index) => (
               <div key={index} className="p-2 font-medium text-center border-l">
                 <div>{format(day, "EEE")}</div>
                 <div className="text-sm text-muted-foreground">

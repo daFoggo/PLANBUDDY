@@ -18,44 +18,43 @@ import { useAuth } from "@/hooks/use-auth";
 const MeetingCUDialog = ({
   manageType,
   meetingData,
-  isOwner
+  isOwner,
 }: IMeetingCUDialogProps) => {
   const { status } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  if (status === "authenticated" && isOwner) {
-    return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {manageType === "create" ? (
           <Button>
-            {manageType === "create" ? (
-              <CalendarPlus className="size-4" />
-            ) : (
-              <CalendarCog className="size-4" />
-            )}
-            {manageType === "create" ? "Create Meeting" : "Edit Meeting"}
+            <CalendarPlus className="size-4" />
+            Create Meeting
           </Button>
-        </DialogTrigger>
-        <DialogContent className="w-[95%] sm:w-[625px] rounded-lg">
-          <DialogHeader>
-            <DialogTitle className="text-xl">
-              {manageType === "create" ? "Create Meeting" : "Edit Meeting"}
-            </DialogTitle>
-            <DialogDescription>
-              {manageType === "create"
-                ? "Schedule new meeting in just one minute!"
-                : "Edit your meeting details"}
-            </DialogDescription>
-            <MeetingMangeForm
-              onClose={() => setIsOpen(false)}
-              meetingData={meetingData}
-            />
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  return null;
+        ) : status === "authenticated" && isOwner ? (
+          <Button>
+            <CalendarCog className="size-4" />
+            Edit Meeting
+          </Button>
+        ) : null}
+      </DialogTrigger>
+      <DialogContent className="w-[95%] sm:w-[625px] rounded-lg">
+        <DialogHeader>
+          <DialogTitle className="text-xl">
+            {manageType === "create" ? "Create Meeting" : "Edit Meeting"}
+          </DialogTitle>
+          <DialogDescription>
+            {manageType === "create"
+              ? "Schedule new meeting in just one minute!"
+              : "Edit your meeting details"}
+          </DialogDescription>
+          <MeetingMangeForm
+            onClose={() => setIsOpen(false)}
+            meetingData={meetingData}
+          />
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 export default MeetingCUDialog;

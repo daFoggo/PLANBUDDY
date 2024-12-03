@@ -8,6 +8,8 @@ model Meeting {
 
   dateType      DateType   @default(WEEKLY)
   proposedDates DateTime[]
+  startTime     String
+  endTime       String
   finalDate     DateTime?
 
   status    MeetingStatus @default(PUBLISHED)

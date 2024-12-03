@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { auth } from "../auth/[...nextauth]/route";
-import { PARTICIPANT_ROLE } from "@/components/utils/constant";
+import { PARTICIPANT_ROLE, RESPONSE_STATUS, SLOT_STATUS } from "@/components/utils/constant";
 
 const prisma = new PrismaClient();
 
@@ -204,6 +204,8 @@ export async function POST(req: NextRequest) {
         proposedDates: meetingData.proposedDates.map(
           (date: string) => new Date(date)
         ),
+        startTime: meetingData.startTime,
+        endTime: meetingData.endTime,
         status: meetingData.status,
 
         // Create participants
@@ -323,6 +325,12 @@ export async function PUT(req: NextRequest) {
           (date: string) => new Date(date)
         ),
       }),
+      ...(meetingUpdateData.startTime && {
+        startTime: meetingUpdateData.startTime,
+      }),
+      ...(meetingUpdateData.endTime && {
+        endTime: meetingUpdateData.endTime,
+      }),
       ...(meetingUpdateData.status && { status: meetingUpdateData.status }),
     };
 
@@ -369,7 +377,7 @@ export async function PUT(req: NextRequest) {
         where: { meetingId: meetingUpdateData.id },
       });
 
-      const newSlots = await prisma.availableSlot.createMany({
+      await prisma.availableSlot.createMany({
         data: meetingUpdateData.availableSlots.map((slot: any) => ({
           meetingId: meetingUpdateData.id,
           userId: session.user.id,
@@ -379,6 +387,12 @@ export async function PUT(req: NextRequest) {
           timeZone: slot.timeZone,
         })),
       });
+
+      const newSlots = await prisma.availableSlot.findMany({
+        where: { meetingId: meetingUpdateData.id }
+      });
+
+      updatedMeeting.availableSlots = newSlots;
     }
 
     return NextResponse.json(
@@ -513,5 +527,149 @@ export async function DELETE(req: NextRequest) {
         { status: 500 }
       );
     }
+  }
+}
+
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const updateData = await req.json();
+    const { 
+      meetingId, 
+      userId, 
+      availableSlots, 
+      responseStatus 
+    } = updateData;
+
+    if (!meetingId) {
+      return NextResponse.json(
+        { error: "Meeting ID is required" }, 
+        { status: 400 }
+      );
+    }
+
+    const meeting = await prisma.meeting.findUnique({
+      where: { id: meetingId }
+    });
+
+    if (!meeting) {
+      return NextResponse.json(
+        { error: "Meeting not found" }, 
+        { status: 404 }
+      );
+    }
+
+    let participant = await prisma.meetingParticipant.findUnique({
+      where: { 
+        userId_meetingId: { 
+          userId, 
+          meetingId 
+        } 
+      }
+    });
+
+    if (!participant) {
+      participant = await prisma.meetingParticipant.create({
+        data: {
+          userId,
+          meetingId,
+          role: PARTICIPANT_ROLE.PARTICIPANT,
+          responseStatus: responseStatus || RESPONSE_STATUS.PENDING
+        }
+      });
+    }
+
+    // Update response status if provided
+    if (responseStatus) {
+      await prisma.meetingParticipant.update({
+        where: { 
+          userId_meetingId: { 
+            userId, 
+            meetingId 
+          } 
+        },
+        data: { 
+          responseStatus 
+        }
+      });
+    }
+
+    // Handle available slots (partial update)
+    if (availableSlots) {
+      // If availableSlots is an array, replace all slots
+      if (Array.isArray(availableSlots)) {
+        // Remove existing slots for this user and meeting
+        await prisma.availableSlot.deleteMany({
+          where: { 
+            userId, 
+            meetingId 
+          }
+        });
+
+        // Create new available slots
+        await prisma.availableSlot.createMany({
+          data: availableSlots.map((slot: any) => ({
+            meetingId,
+            userId,
+            date: new Date(slot.date),
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            status: slot.status || SLOT_STATUS.AVAILABLE,
+            timeZone: slot.timeZone
+          }))
+        });
+      } 
+      // If availableSlots is an object, do selective updates
+      else {
+        // Existing slots update logic can be added here if needed
+        // For now, we'll just demonstrate the possibility of selective updates
+        console.log("Selective slot updates not implemented in this version");
+      }
+    }
+
+    // Fetch updated participant with slots
+    const updatedParticipant = await prisma.meetingParticipant.findUnique({
+      where: { 
+        userId_meetingId: { 
+          userId, 
+          meetingId 
+        } 
+      },
+      include: {
+        user: true,
+        meeting: {
+          include: {
+            availableSlots: {
+              where: { userId }
+            }
+          }
+        }
+      }
+    });
+
+    return NextResponse.json(
+      { 
+        participant: updatedParticipant,
+        message: "Participant updated successfully" 
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating participant:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to update participant",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
   }
 }

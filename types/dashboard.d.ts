@@ -18,6 +18,8 @@ export interface IMeeting {
 
   dateType: DATE_TYPE;
   proposedDates: Date[];
+  startTime: string;
+  endTime: string;
   finalDate: Date?;
 
   status: MEETING_STATUS;

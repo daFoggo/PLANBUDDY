@@ -27,3 +27,9 @@ export const getHourDecimal = (timeString: string): number => {
   const [hours, minutes] = timeString.split(":");
   return Number(hours) + Number(minutes) / 60;
 };
+
+export const determineOverallStatus = (statuses: SLOT_STATUS[]): SLOT_STATUS => {
+  if (statuses.includes(SLOT_STATUS.UNAVAILABLE)) return SLOT_STATUS.UNAVAILABLE;
+  if (statuses.includes(SLOT_STATUS.TENTATIVE)) return SLOT_STATUS.TENTATIVE;
+  return SLOT_STATUS.AVAILABLE;
+};

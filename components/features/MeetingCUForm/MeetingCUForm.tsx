@@ -73,8 +73,8 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
       proposedDates: meetingData?.proposedDates
         ? meetingData.proposedDates.map((date) => new Date(date))
         : [],
-      startTime: meetingData?.availableSlots[0].startTime || "08:00",
-      endTime: meetingData?.availableSlots[0].endTime || "19:00",
+      startTime: meetingData?.startTime || "08:00",
+      endTime: meetingData?.endTime || "19:00",
     },
   });
 
@@ -82,8 +82,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   useEffect(() => {
     if (meetingData) {
       const isAllDay =
-        meetingData.availableSlots[0].startTime === "00:00" &&
-        meetingData.availableSlots[0].endTime === "23:30";
+        meetingData.startTime === "00:00" && meetingData.endTime === "23:30";
       setIsAllDay(isAllDay);
     }
   }, [meetingData]);
@@ -121,6 +120,8 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
       note: values.note,
       dateType: values.dateType,
       proposedDates: values.proposedDates.map(normalizeDate),
+      startTime: values.isAllDay ? "00:00" : values.startTime,
+      endTime: values.isAllDay ? "23:30" : values.endTime,
       status: MEETING_STATUS.PUBLISHED,
 
       availableSlots: values.proposedDates.map((date) => ({
@@ -153,8 +154,10 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data.meeting);
-        router.push(`/meeting/${data.meeting.id}`);
+        meetingData
+          ? router.refresh()
+          : router.push(`/meeting/${data.meeting.id}`);
+
         onClose();
         meetingData
           ? toast.success("Meeting updated successfully")

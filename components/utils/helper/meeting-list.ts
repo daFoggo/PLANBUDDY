@@ -27,18 +27,15 @@ export const formatMeetingDateTime = (meeting: IMeeting) => {
       .join(", ");
 
     let formattedTime = "TBD";
-    if (meeting.availableSlots && meeting.availableSlots.length > 0) {
-      const slot = meeting.availableSlots[0];
-      const defaultDate = new Date();
-      const startTime = parse(slot.startTime, "HH:mm", defaultDate);
-      const endTime = parse(slot.endTime, "HH:mm", defaultDate);
-      const formattedStart = format(startTime, "h:mm a");
-      const formattedEnd = format(endTime, "h:mm a");
-      if (formattedStart === "12:00 AM" && formattedEnd === "11:30 PM") {
-        formattedTime = "All Day";
-      } else {
-        formattedTime = `${formattedStart} - ${formattedEnd}`;
-      }
+    const defaultDate = new Date();
+    const startTime = parse(meeting.startTime, "HH:mm", defaultDate);
+    const endTime = parse(meeting.endTime, "HH:mm", defaultDate);
+    const formattedStart = format(startTime, "h:mm a");
+    const formattedEnd = format(endTime, "h:mm a");
+    if (formattedStart === "12:00 AM" && formattedEnd === "11:30 PM") {
+      formattedTime = "All Day";
+    } else {
+      formattedTime = `${formattedStart} - ${formattedEnd}`;
     }
 
     return {

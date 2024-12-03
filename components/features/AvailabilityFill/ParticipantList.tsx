@@ -31,7 +31,7 @@ const ParticipantList = ({
         <Users className="size-4" />
         <h1 className="font-semibold text-xl">Participants</h1>
       </div>
-      
+
       <div className="flex flex-col gap-2">
         {participants.map((participant) => (
           <Participant
@@ -55,10 +55,12 @@ const Participant = ({
   isOwner: boolean;
 }) => {
   const { status } = useAuth();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleDeleteParticipant = async () => {
     if (participant.role === "OWNER") {
       toast.error("You are the owner of the meeting");
+      setIsDialogOpen(false);
     } else {
       try {
         const response = await fetch(
@@ -70,6 +72,7 @@ const Participant = ({
 
         if (response.ok) {
           toast.success("Participant deleted successfully");
+          setIsDialogOpen(false);
         }
       } catch (error) {
         toast.error("Failed to delete participant");
@@ -78,7 +81,7 @@ const Participant = ({
   };
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-2 items-center hover:cursor-pointer">
       <Avatar
         key={participant?.user.id}
         className="h-6 w-6 border-2 border-background"
@@ -91,7 +94,7 @@ const Participant = ({
       </Avatar>
       <span className="font-semibold text-sm">{participant?.user.name}</span>
       {status === "authenticated" && isOwner && (
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="ghost" size="sm">
               <UserRoundX className="size-4" />
@@ -102,9 +105,15 @@ const Participant = ({
             <p>Are you sure you want to delete this participant?</p>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
               </DialogClose>
-              <Button variant="destructive" onClick={handleDeleteParticipant}>Delete</Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteParticipant}
+                type="submit"
+              >
+                Delete
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

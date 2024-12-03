@@ -6,16 +6,16 @@ export const getStatusColor = (
 ) => {
   const baseColors = {
     [SLOT_STATUS.AVAILABLE]: {
-      drag: "bg-green-500/50",
-      base: "bg-green-500/70 dark:bg-green-500/80",
+      drag: "bg-green-500/30 dark:bg-green-500/20",
+      base: "bg-green-500/70 dark:bg-green-500/50",
     },
-    [SLOT_STATUS.TENTATIVE]: {
-      drag: "bg-yellow-500/50",
-      base: "bg-yellow-500/70 dark:bg-yellow-500/80",
+    [SLOT_STATUS.IFNEEDED]: {
+      drag: "bg-yellow-500/30 dark:bg-yellow-500/20",
+      base: "bg-yellow-500/70 dark:bg-yellow-500/50",
     },
     [SLOT_STATUS.UNAVAILABLE]: {
-      drag: "bg-red-500/50",
-      base: "bg-red-500/70 dark:bg-red-500/80",
+      drag: "bg-red-500/30 dark:bg-red-500/20",
+      base: "bg-red-500/70 dark:bg-red-500/50",
     },
   };
 
@@ -26,10 +26,4 @@ export const getStatusColor = (
 export const getHourDecimal = (timeString: string): number => {
   const [hours, minutes] = timeString.split(":");
   return Number(hours) + Number(minutes) / 60;
-};
-
-export const determineOverallStatus = (statuses: SLOT_STATUS[]): SLOT_STATUS => {
-  if (statuses.includes(SLOT_STATUS.UNAVAILABLE)) return SLOT_STATUS.UNAVAILABLE;
-  if (statuses.includes(SLOT_STATUS.TENTATIVE)) return SLOT_STATUS.TENTATIVE;
-  return SLOT_STATUS.AVAILABLE;
 };

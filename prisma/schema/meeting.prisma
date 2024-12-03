@@ -48,7 +48,7 @@ model AvailableSlot {
   startTime String
   endTime   String
   timeZone  String
-  status    SlotStatus @default(AVAILABLE)
+  status    SlotStatus @default(UNAVAILABLE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

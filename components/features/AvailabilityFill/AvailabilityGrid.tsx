@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { addDays, format, startOfWeek } from "date-fns";
+import React, { useState, useMemo, useEffect } from "react";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-
-import { Pencil, Save, SquarePlus } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { Loader2, Pencil, Save, SquarePlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,19 +17,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SLOT_STATUS } from "@/components/utils/constant";
-
-import { ITimeSlot } from "@/types/availability-fill";
-import {
-  determineOverallStatus,
-  getHourDecimal,
-  getStatusColor,
-} from "@/components/utils/helper/availability-fill";
-import { useAuth } from "@/hooks/use-auth";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import LoginDialogContent from "../Auth/LoginDialogContent";
 import { IMeeting } from "@/types/dashboard";
-import { toast } from "sonner";
+import { SLOT_STATUS } from "@/components/utils/constant";
+import { ITimeSlot } from "@/types/availability-fill";
+import {
+  getHourDecimal,
+  getStatusColor,
+} from "@/components/utils/helper/availability-fill";
+import { useRouter } from "next/navigation";
 
 const AvailabilityGrid = ({
   meeting,
@@ -36,6 +34,7 @@ const AvailabilityGrid = ({
   meeting: IMeeting;
   isOwner: boolean;
 }) => {
+  const router = useRouter();
   const { status, session } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -50,24 +49,19 @@ const AvailabilityGrid = ({
   const [dragEnd, setDragEnd] = useState<{ row: number; col: number } | null>(
     null
   );
-  const [date, setDate] = useState<Date>(new Date());
   const [isSaving, setIsSaving] = useState(false);
 
-  // caculate time slots
+  // Create time slots based on meeting's time
   const timeSlots: ITimeSlot[] = useMemo(() => {
     const slots = [];
-    const startHour = getHourDecimal(meeting.availableSlots[0].startTime);
-    const endHour = getHourDecimal(meeting.availableSlots[0].endTime);
+    const startHour = getHourDecimal(meeting.startTime);
+    const endHour = getHourDecimal(meeting.endTime);
 
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute of [0, 30]) {
         slots.push({
           time: format(new Date().setHours(hour, minute), "HH:mm"),
-          status: [
-            SLOT_STATUS.UNAVAILABLE,
-            SLOT_STATUS.UNAVAILABLE,
-            SLOT_STATUS.UNAVAILABLE,
-          ],
+          status: meeting.proposedDates.map(() => SLOT_STATUS.UNAVAILABLE),
         });
       }
     }
@@ -75,66 +69,96 @@ const AvailabilityGrid = ({
     if (endHour % 1 === 0) {
       slots.push({
         time: format(new Date().setHours(endHour, 0), "HH:mm"),
-        status: [
-          SLOT_STATUS.UNAVAILABLE,
-          SLOT_STATUS.UNAVAILABLE,
-          SLOT_STATUS.UNAVAILABLE,
-        ],
+        status: meeting.proposedDates.map(() => SLOT_STATUS.UNAVAILABLE),
       });
     }
 
     return slots;
-  }, [meeting.availableSlots]);
+  }, [meeting.startTime, meeting.endTime, meeting.proposedDates]);
 
   const [availability, setAvailability] = useState<ITimeSlot[]>(timeSlots);
+  // Map data to table
+  useEffect(() => {
+    const initialAvailability = [...timeSlots];
+
+    if (meeting.availableSlots && meeting.availableSlots.length > 0) {
+      meeting.availableSlots.forEach((slot) => {
+        const slotStartTime = slot.startTime;
+        const slotEndTime = slot.endTime;
+
+        for (let i = 0; i < initialAvailability.length; i++) {
+          const slotTime = initialAvailability[i].time;
+          if (slotTime >= slotStartTime && slotTime <= slotEndTime) {
+            const dateIndex = meeting.proposedDates.findIndex(
+              (proposedDate) =>
+                format(new Date(proposedDate), "yyyy-MM-dd") ===
+                format(new Date(slot.date), "yyyy-MM-dd")
+            );
+            if (dateIndex !== -1) {
+              initialAvailability[i].status[dateIndex] = slot.status;
+            }
+          }
+        }
+      });
+    }
+
+    setAvailability(initialAvailability);
+  }, [
+    meeting.availableSlots,
+    session?.user.id,
+    meeting.startTime,
+    meeting.endTime,
+    meeting.proposedDates,
+  ]);
 
   const handleSaveAvailability = async () => {
-    if (!session) return;
-
     setIsSaving(true);
-
-    // Prepare available slots data
-    const availableSlots = meeting.proposedDates.map((day, dayIndex) => {
-      // For each time slot, filter the status for this specific day
-      const dayStatuses = availability.map((slot) => slot.status[dayIndex]);
-
-      return {
-        date: day,
-        startTime: meeting.availableSlots[0].startTime,
-        endTime: meeting.availableSlots[0].endTime,
-        status: determineOverallStatus(dayStatuses), // Determine single status
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      };
-    });
-
     try {
+      const availabilitySlots = [];
+      for (let i = 0; i < availability.length; i++) {
+        for (let j = 0; j < meeting.proposedDates.length; j++) {
+          availabilitySlots.push({
+            meetingId: meeting.id,
+            date: meeting.proposedDates[j],
+            startTime: availability[i].time,
+            endTime: format(
+              new Date().setHours(
+                parseInt(availability[i].time.split(":")[0]),
+                parseInt(availability[i].time.split(":")[1]) + 30
+              ),
+              "HH:mm"
+            ),
+            status:
+              availability[i].status[j] === SLOT_STATUS.AVAILABLE
+                ? "AVAILABLE"
+                : availability[i].status[j] === SLOT_STATUS.IFNEEDED
+                ? "IFNEEDED"
+                : "UNAVAILABLE",
+          });
+        }
+      }
+
       const response = await fetch(`/api/meeting?meetingId=${meeting.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          meetingId: meeting.id,
-          userId: session.user.id,
-          availableSlots: availableSlots,
-          responseStatus: "ACCEPTED", 
-        }),
+        body: JSON.stringify(availabilitySlots),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || "Failed to save availability");
+        const error = await response.json();
+        console.error("Error saving availability:", error);
+        throw new Error(`Error saving availability: ${error.error}`);
       }
-
-      toast.success("Updated your availability successfully");
-
-      setIsEditing(false);
+      router.refresh();
+      toast.success("Availability saved successfully");
     } catch (error) {
       console.error("Error saving availability:", error);
-      toast.success("Failed to update your availability");
+      toast.error("Error saving availability. Please try again.");
     } finally {
       setIsSaving(false);
+      setIsEditing(false);
     }
   };
 
@@ -154,13 +178,23 @@ const AvailabilityGrid = ({
     switch (currentStatus) {
       case SLOT_STATUS.AVAILABLE:
         return SLOT_STATUS.UNAVAILABLE;
-      case SLOT_STATUS.TENTATIVE:
+      case SLOT_STATUS.IFNEEDED:
         return SLOT_STATUS.UNAVAILABLE;
       case SLOT_STATUS.UNAVAILABLE:
         return selectedStatus;
       default:
         return SLOT_STATUS.UNAVAILABLE;
     }
+  };
+
+  const updateSlotStatus = (
+    rowIndex: number,
+    colIndex: number,
+    status?: SLOT_STATUS
+  ) => {
+    const newAvailability = [...availability];
+    newAvailability[rowIndex].status[colIndex] = status ?? selectedStatus;
+    setAvailability(newAvailability);
   };
 
   const handleMouseEnter = (rowIndex: number, colIndex: number) => {
@@ -187,16 +221,6 @@ const AvailabilityGrid = ({
     setIsDragging(false);
     setDragStart(null);
     setDragEnd(null);
-  };
-
-  const updateSlotStatus = (
-    rowIndex: number,
-    colIndex: number,
-    status?: SLOT_STATUS
-  ) => {
-    const newAvailability = [...availability];
-    newAvailability[rowIndex].status[colIndex] = status ?? selectedStatus;
-    setAvailability(newAvailability);
   };
 
   const isInDragSelection = (rowIndex: number, colIndex: number) => {
@@ -250,12 +274,12 @@ const AvailabilityGrid = ({
               </Button>
               <Button onClick={handleSaveAvailability} disabled={isSaving}>
                 {isSaving ? (
-                  "Saving..."
-                ) : (
                   <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
                   </>
+                ) : (
+                  "Submit"
                 )}
               </Button>
             </div>
@@ -283,10 +307,10 @@ const AvailabilityGrid = ({
                       Available
                     </div>
                   </SelectItem>
-                  <SelectItem value={SLOT_STATUS.TENTATIVE}>
+                  <SelectItem value={SLOT_STATUS.IFNEEDED}>
                     <div className="flex items-center gap-2">
                       <div className="bg-yellow-500 w-3 h-3 rounded-full" />
-                      Tentative
+                      If needed
                     </div>
                   </SelectItem>
                   <SelectItem value={SLOT_STATUS.UNAVAILABLE}>
@@ -311,7 +335,7 @@ const AvailabilityGrid = ({
             </div>
             <div className="flex items-center gap-2">
               <div className="bg-yellow-500 w-3 h-3 rounded-full" />
-              Tentative
+              If needed
             </div>
           </div>
         )}
@@ -368,7 +392,7 @@ const AvailabilityGrid = ({
           </div>
         </div>
       </CardContent>
-      <Dialog open={isDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="w-[95%] sm:w-[425px] rounded-lg"

@@ -5,6 +5,7 @@ import {
   PARTICIPANT_ROLE,
   RESPONSE_STATUS,
   SLOT_STATUS,
+  USER_TYPE,
 } from "@/components/utils/constant";
 
 const prisma = new PrismaClient();
@@ -455,6 +456,10 @@ export async function DELETE(req: NextRequest) {
       // Delete participant
       await prisma.meetingParticipant.delete({
         where: { id: participantId },
+      });
+
+      await prisma.availableSlot.deleteMany({
+        where: { userId: session.user.id },
       });
 
       return NextResponse.json(

@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { Loader2, Pencil, Save, SquarePlus } from "lucide-react";
+import { Loader2, Pencil, RefreshCcw, SquarePlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,14 +22,18 @@ import LoginDialogContent from "../Auth/LoginDialogContent";
 import { IMeeting } from "@/types/dashboard";
 import { SLOT_STATUS } from "@/components/utils/constant";
 import { ITimeSlot } from "@/types/availability-fill";
-import {
-  getHourDecimal,
-  getStatusColor,
-} from "@/components/utils/helper/availability-fill";
+import { getHourDecimal } from "@/components/utils/helper/availability-fill";
 import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const AvailabilityGrid = ({
   meeting,
+  isOwner,
 }: {
   meeting: IMeeting;
   isOwner: boolean;
@@ -50,6 +54,42 @@ const AvailabilityGrid = ({
     null
   );
   const [isSaving, setIsSaving] = useState(false);
+
+  // Common slot from all users
+  const commonSlotStatuses = (
+    slots: ITimeSlot[],
+    availableSlots: any[]
+  ): ITimeSlot[] => {
+    const commonSlots = [...slots];
+
+    // Count total number of users
+    const totalUsers = new Set(availableSlots.map((slot) => slot.userId)).size;
+
+    commonSlots.forEach((slot, slotIndex) => {
+      slot.status = slot.status.map((_, dateIndex) => {
+        const positiveAvailableUserCount = availableSlots.filter(
+          (s) =>
+            s.startTime === slot.time &&
+            format(new Date(s.date), "yyyy-MM-dd") ===
+              format(
+                new Date(meeting.proposedDates[dateIndex]),
+                "yyyy-MM-dd"
+              ) &&
+            (s.status === "AVAILABLE" || s.status === "IFNEEDED")
+        ).length;
+
+        if (positiveAvailableUserCount === totalUsers) {
+          return SLOT_STATUS.AVAILABLE; // All users available or if needed
+        } else if (positiveAvailableUserCount > 0) {
+          return SLOT_STATUS.IFNEEDED; // Some users available or if needed
+        } else {
+          return SLOT_STATUS.UNAVAILABLE; // No users available
+        }
+      });
+    });
+
+    return commonSlots;
+  };
 
   // Create time slots based on meeting's time
   const timeSlots: ITimeSlot[] = useMemo(() => {
@@ -77,37 +117,85 @@ const AvailabilityGrid = ({
   }, [meeting.startTime, meeting.endTime, meeting.proposedDates]);
 
   const [availability, setAvailability] = useState<ITimeSlot[]>(timeSlots);
+
+  const getSlotColor = (status: SLOT_STATUS, inDragSelection: boolean) => {
+    if (inDragSelection) {
+      switch (status) {
+        case SLOT_STATUS.AVAILABLE:
+          return "bg-green-500/30 dark:bg-green-500/20";
+        case SLOT_STATUS.IFNEEDED:
+          return "bg-yellow-500/30 dark:bg-yellow-500/20";
+        case SLOT_STATUS.UNAVAILABLE:
+          return "bg-red-500/30 dark:bg-red-500/20";
+        default:
+          return "";
+      }
+    }
+
+    switch (status) {
+      case SLOT_STATUS.AVAILABLE:
+        return "bg-green-500"; // All users available
+      case SLOT_STATUS.IFNEEDED:
+        return isEditing ? "bg-yellow-500" : "bg-green-300"; // Some users available
+      case SLOT_STATUS.UNAVAILABLE:
+        return isEditing ? "bg-red-500/50" : "";
+      default:
+        return "bg-gray-200";
+    }
+  };
+
   // Map data to table
   useEffect(() => {
-    const initialAvailability = [...timeSlots];
+    let initialAvailability = timeSlots.map((slot) => ({
+      ...slot,
+      status: meeting.proposedDates.map(() => SLOT_STATUS.UNAVAILABLE),
+    }));
 
     if (meeting.availableSlots && meeting.availableSlots.length > 0) {
-      meeting.availableSlots.forEach((slot) => {
-        const slotStartTime = slot.startTime;
-        const slotEndTime = slot.endTime;
+      // Default view: aggregated statuses
+      if (!isEditing) {
+        initialAvailability = commonSlotStatuses(
+          initialAvailability,
+          meeting.availableSlots
+        );
+      }
+      // Edit view: current user's slots
+      else {
+        const userSlots = meeting.availableSlots.filter(
+          (slot) => slot.userId === session?.user?.id
+        );
 
-        for (let i = 0; i < initialAvailability.length; i++) {
-          const slotTime = initialAvailability[i].time;
-          if (slotTime >= slotStartTime && slotTime <= slotEndTime) {
-            const dateIndex = meeting.proposedDates.findIndex(
-              (proposedDate) =>
-                format(new Date(proposedDate), "yyyy-MM-dd") ===
-                format(new Date(slot.date), "yyyy-MM-dd")
+        userSlots.forEach((slot) => {
+          const dateIndex = meeting.proposedDates.findIndex(
+            (proposedDate) =>
+              format(new Date(proposedDate), "yyyy-MM-dd") ===
+              format(new Date(slot.date), "yyyy-MM-dd")
+          );
+
+          if (dateIndex !== -1) {
+            const slotTime = slot.startTime;
+            const matchingSlotIndex = initialAvailability.findIndex(
+              (availSlot) => availSlot.time === slotTime
             );
-            if (dateIndex !== -1) {
-              initialAvailability[i].status[dateIndex] = slot.status;
+
+            if (matchingSlotIndex !== -1) {
+              initialAvailability[matchingSlotIndex].status[dateIndex] =
+                slot.status === "AVAILABLE"
+                  ? SLOT_STATUS.AVAILABLE
+                  : slot.status === "IFNEEDED"
+                  ? SLOT_STATUS.IFNEEDED
+                  : SLOT_STATUS.UNAVAILABLE;
             }
           }
-        }
-      });
+        });
+      }
     }
 
     setAvailability(initialAvailability);
   }, [
+    isEditing,
     meeting.availableSlots,
-    session?.user.id,
-    meeting.startTime,
-    meeting.endTime,
+    session?.user?.id,
     meeting.proposedDates,
   ]);
 
@@ -119,6 +207,7 @@ const AvailabilityGrid = ({
         for (let j = 0; j < meeting.proposedDates.length; j++) {
           availabilitySlots.push({
             meetingId: meeting.id,
+            userId: session?.user?.id,
             date: meeting.proposedDates[j],
             startTime: availability[i].time,
             endTime: format(
@@ -244,6 +333,23 @@ const AvailabilityGrid = ({
       <CardHeader className="p-0 flex flex-row justify-between items-center">
         <CardTitle>Fill your availability</CardTitle>
         <div className="flex items-center space-x-2">
+          <TooltipProvider>
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="text-primary border-primary bg-primary/20 hover:bg-primary/30 hover:text-primary"
+                  onClick={() => router.refresh()}
+                >
+                  <RefreshCcw className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="border-primary">
+                Refresh page
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {!isEditing ? (
             status === "authenticated" ? (
               <Button onClick={() => setIsEditing(true)}>
@@ -287,7 +393,7 @@ const AvailabilityGrid = ({
         </div>
       </CardHeader>
       <CardContent className="p-0 flex flex-col items-center space-y-4">
-        {isEditing ? (
+        {isEditing && (
           <div className="flex justify-center items-center gap-2">
             <p className="font-semibold shrink-0">Availability</p>
             <Select
@@ -322,21 +428,6 @@ const AvailabilityGrid = ({
                 </SelectGroup>
               </SelectContent>
             </Select>
-          </div>
-        ) : (
-          <div className="flex space-x-4 items-center justify-center">
-            <div className="flex items-center gap-2">
-              <div className="bg-green-500 w-3 h-3 rounded-full" />
-              Available
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="bg-red-500 w-3 h-3 rounded-full" />
-              Unavailable
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="bg-yellow-500 w-3 h-3 rounded-full" />
-              If needed
-            </div>
           </div>
         )}
 
@@ -377,7 +468,10 @@ const AvailabilityGrid = ({
                         "border-l relative",
                         rowIndex % 2 === 0 && "border-t",
                         "transition-colors duration-100",
-                        getStatusColor(status, inDragSelection)
+                        getSlotColor(
+                          status,
+                          isInDragSelection(rowIndex, colIndex)
+                        )
                       )}
                       onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
                       onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}

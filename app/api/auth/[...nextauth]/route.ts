@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
 
 const guestSchema = z.object({
   name: z
@@ -19,16 +20,13 @@ const customAdapter = {
   createUser: async (user: any) => {
     const data = {
       ...user,
-      email: user.email || `${user.name}@placeholder.com`,
+      email: user.email || `${uuidv4()}@guest.local`,
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
       userType: "GOOGLE_USER",
     };
 
     const newUser = await prisma.user.create({ data });
-    return {
-      ...newUser,
-      email: newUser.email || `${newUser.name}@placeholder.com`,
-    };
+    return newUser;
   },
 };
 
@@ -63,21 +61,12 @@ export const {
         }
 
         const { name } = parsedCredentials.data;
-
-        const user = await prisma.user.upsert({
-          where: {
-            email: `guest_${name
-              .toLowerCase()
-              .replace(/\s+/g, "_")}@guest.local`,
-          },
-          update: {},
-          create: {
+        const user = await prisma.user.create({
+          data: {
             name,
             userType: "GUEST",
             timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
-            email: `guest_${name
-              .toLowerCase()
-              .replace(/\s+/g, "_")}@guest.local`,
+            email: `${uuidv4()}@guest.local`,
             emailVerified: null,
           },
         });

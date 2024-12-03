@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import { IMeetingParticipant, IUser } from "@/types/dashboard";
 import { AvatarImage } from "@radix-ui/react-avatar";
-import { UserRoundX, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { Loader2, UserRoundX, Users } from "lucide-react";
+import {useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const ParticipantList = ({
   participants,
@@ -56,8 +56,11 @@ const Participant = ({
 }) => {
   const { status } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleDeleteParticipant = async () => {
+    setIsLoading(true);
     if (participant.role === "OWNER") {
       toast.error("You are the owner of the meeting");
       setIsDialogOpen(false);
@@ -73,9 +76,12 @@ const Participant = ({
         if (response.ok) {
           toast.success("Participant deleted successfully");
           setIsDialogOpen(false);
+          router.refresh(); 
         }
       } catch (error) {
         toast.error("Failed to delete participant");
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -105,14 +111,26 @@ const Participant = ({
             <p>Are you sure you want to delete this participant?</p>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
               </DialogClose>
               <Button
                 variant="destructive"
                 onClick={handleDeleteParticipant}
                 type="submit"
               >
-                Delete
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete"
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

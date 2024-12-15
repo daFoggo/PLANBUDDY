@@ -24,6 +24,7 @@ import {
 import { IMeeting } from "@/types/dashboard";
 import AvailabilityChoose from "@/components/features/AvailabilityFill/AvailabilityChoose";
 import { auth } from "@/app/api/auth/[...nextauth]/route";
+import MeetingQRGen from "@/components/features/MeetingCUForm/MeetingQRGen";
 
 const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
   try {
@@ -115,6 +116,7 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
               </CardDescription>
             </div>
             <div className="space-x-2 flex items-center">
+              <MeetingQRGen meetingId={params.meetingId} />
               <MeetingCopy meetingId={params.meetingId} />
               <MeetingDelete meetingId={params.meetingId} isOwner={isOwner} />
               <MeetingCUDialog

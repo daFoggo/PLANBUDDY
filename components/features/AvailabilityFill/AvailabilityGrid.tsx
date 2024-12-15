@@ -54,6 +54,7 @@ const AvailabilityGrid = ({
     null
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Common slot from all users
   const commonSlotStatuses = (
@@ -340,9 +341,24 @@ const AvailabilityGrid = ({
                   variant="outline"
                   size="icon"
                   className="text-primary border-primary bg-primary/20 hover:bg-primary/30 hover:text-primary"
-                  onClick={() => router.refresh()}
+                  onClick={() => {
+                    setIsRefreshing(true);
+                    try {
+                      router.refresh();
+                    } catch (error) {
+                      console.error("Error refreshing page:", error);
+                      toast.error("Error refreshing page. Please try again.");
+                    } finally {
+                      setIsRefreshing(false);
+                      toast.success("Page refreshed successfully");
+                    }
+                  }}
                 >
-                  <RefreshCcw className="size-4" />
+                  {isRefreshing ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <RefreshCcw className="size-4" />
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="border-primary">
@@ -460,7 +476,6 @@ const AvailabilityGrid = ({
                 </div>
 
                 {slot.status.map((status, colIndex) => {
-                  const inDragSelection = isInDragSelection(rowIndex, colIndex);
                   return (
                     <div
                       key={colIndex}

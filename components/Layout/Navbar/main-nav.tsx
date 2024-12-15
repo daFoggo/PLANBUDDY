@@ -1,13 +1,12 @@
-import Link from "next/link";
+import Logo from "@/components/common/Logo";
 import {
   NavigationMenu,
-  NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
-  navigationMenuTriggerStyle,
+  NavigationMenuList
 } from "@/components/ui/navigation-menu";
 import { IMainNavProps } from "@/types/navbar";
-import Logo from "@/components/common/Logo";
+import Link from "next/link";
 
 const MainNav = ({ items }: IMainNavProps) => {
   return (

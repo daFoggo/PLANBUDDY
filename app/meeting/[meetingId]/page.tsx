@@ -1,11 +1,16 @@
-import { notFound } from "next/navigation";
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 
-import { Calendar, CalendarSearch, Clock, Users } from "lucide-react";
+import { auth } from "@/app/api/auth/[...nextauth]/route";
 import PageTitle from "@/components/common/PageTitle";
-import { Badge } from "@/components/ui/badge";
+import AvailabilityChoose from "@/components/features/AvailabilityFill/AvailabilityChoose";
+import AvailabilityGrid from "@/components/features/AvailabilityFill/AvailabilityGrid";
+import MeetingCopy from "@/components/features/MeetingCUForm/MeetingCopy";
+import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
+import MeetingDelete from "@/components/features/MeetingCUForm/MeetingDelete";
+import MeetingQRGen from "@/components/features/MeetingCUForm/MeetingQRGen";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -13,18 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
-import MeetingDelete from "@/components/features/MeetingCUForm/MeetingDelete";
-import MeetingCopy from "@/components/features/MeetingCUForm/MeetingCopy";
-import AvailabilityGrid from "@/components/features/AvailabilityFill/AvailabilityGrid";
+import { Separator } from "@/components/ui/separator";
 import {
   formatMeetingDateTime,
   getStatusColor,
 } from "@/components/utils/helper/meeting-list";
 import { IMeeting } from "@/types/dashboard";
-import AvailabilityChoose from "@/components/features/AvailabilityFill/AvailabilityChoose";
-import { auth } from "@/app/api/auth/[...nextauth]/route";
-import MeetingQRGen from "@/components/features/MeetingCUForm/MeetingQRGen";
+import { Calendar, CalendarSearch, Clock, Users } from "lucide-react";
 
 const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
   try {
@@ -45,9 +45,10 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
     }
     const data = await response.json();
     const meeting: IMeeting = { ...data.meeting, id: params.meetingId };
-    
+
     const isOwner = meeting.participants.some(
-      (participant) => participant.userId === userId && participant.role === "OWNER"
+      (participant) =>
+        participant.userId === userId && participant.role === "OWNER"
     );
 
     const { date, time } = formatMeetingDateTime(meeting);

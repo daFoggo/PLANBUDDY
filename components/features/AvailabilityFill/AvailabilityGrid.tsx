@@ -1,13 +1,8 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
-import { Loader2, Pencil, RefreshCcw, SquarePlus } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -17,19 +12,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import LoginDialogContent from "../Auth/LoginDialogContent";
-import { IMeeting } from "@/types/dashboard";
-import { SLOT_STATUS } from "@/components/utils/constant";
-import { ITimeSlot } from "@/types/availability-fill";
-import { getHourDecimal } from "@/components/utils/helper/availability-fill";
-import { useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { SLOT_STATUS } from "@/components/utils/constant";
+import { getHourDecimal } from "@/components/utils/helper/availability-fill";
+import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
+import { ITimeSlot } from "@/types/availability-fill";
+import { IMeeting } from "@/types/dashboard";
+import { format } from "date-fns";
+import { Loader2, Pencil, RefreshCcw, SquarePlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import LoginDialogContent from "../Auth/LoginDialogContent";
 
 const AvailabilityGrid = ({
   meeting,

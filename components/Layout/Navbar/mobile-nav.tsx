@@ -1,6 +1,5 @@
 "use client";
-import * as React from "react";
-import { Menu } from "lucide-react";
+import Logo from "@/components/common/Logo";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -8,9 +7,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import MobileLink from "./mobile-link";
 import { IMobileNavProps } from "@/types/navbar";
-import Logo from "@/components/common/Logo";
+import { Menu } from "lucide-react";
+import * as React from "react";
+import MobileLink from "./mobile-link";
 
 const MobileNav = ({ items }: IMobileNavProps) => {
   const [open, setOpen] = React.useState(false);

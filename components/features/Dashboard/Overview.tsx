@@ -1,5 +1,4 @@
 import StatisticBLock from "@/components/common/StatisticBlock";
-import { Card } from "@/components/ui/card";
 import { CalendarCheck, Combine, Crown, Handshake } from "lucide-react";
 
 import { IOverviewProps } from "@/types/dashboard";

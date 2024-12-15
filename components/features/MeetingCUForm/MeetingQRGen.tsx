@@ -1,17 +1,17 @@
 "use client";
 
-import { toast } from "sonner";
-import { Download, Link, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+import { Download, QrCode } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
+import { toast } from "sonner";
 
 const MeetingQRGen = ({ meetingId }: { meetingId: string }) => {
   const handleDownloadQR = async () => {

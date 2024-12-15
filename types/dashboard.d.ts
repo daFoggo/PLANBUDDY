@@ -77,3 +77,14 @@ export interface IMeetingData {
 export interface IMeetingListProps {
   meetingListData: IMeeting[];
 }
+
+export interface IOverviewProps {
+  overviewData?: {
+    stats: {
+      arrangingMeeting: number;
+      scheduledMeeting: number;
+      hostedMeeting: number;
+      joinedMeeting: number;
+    };
+  };
+}

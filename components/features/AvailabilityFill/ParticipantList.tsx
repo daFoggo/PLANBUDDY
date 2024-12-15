@@ -10,13 +10,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { IMeetingParticipant, IUser } from "@/types/dashboard";
+import { useAuth } from "@/hooks/use-auth";
+import { IMeetingParticipant } from "@/types/dashboard";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { Loader2, UserRoundX, Users } from "lucide-react";
-import {useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const ParticipantList = ({
   participants,

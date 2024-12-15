@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutList, LayoutGrid } from "lucide-react";
+import { LayoutGrid, LayoutList } from "lucide-react";
+import { useState } from "react";
 
 import { IViewToggleProps } from "@/types/view-toggle";
 

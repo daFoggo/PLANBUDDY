@@ -1,7 +1,4 @@
 "use client";
-import { toast } from "sonner";
-import { useState } from "react";
-import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,8 +8,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { Loader2, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const MeetingDelete = ({ meetingId, isOwner }: { meetingId: string, isOwner: boolean }) => {
   const { status } = useAuth();

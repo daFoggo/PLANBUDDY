@@ -1,12 +1,12 @@
-import { Inter } from "next/font/google";
-import localFont from "next/font/local";
-import type { Metadata } from "next";
-import "./globals.css";
 import { ThemeProvider } from "@/components/common/ThemeProvider";
+import Footer from "@/components/Layout/Footer";
 import NavBar from "@/components/Layout/Navbar";
 import { Toaster } from "@/components/ui/sonner";
+import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
-import Footer from "@/components/Layout/Footer";
+import { Inter } from "next/font/google";
+import localFont from "next/font/local";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "1MIN2MEET",

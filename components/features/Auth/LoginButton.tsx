@@ -3,17 +3,11 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogContent,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
-import { signIn } from "next-auth/react";
-import { FaGoogle } from "react-icons/fa";
 import { useState } from "react";
 import UserMenu from "./UserMenu";
-import GuestLoginForm from "./GuestLoginForm";
 
 import { ILoginButtonProps } from "@/types/login-button";
 import LoginDialogContent from "./LoginDialogContent";

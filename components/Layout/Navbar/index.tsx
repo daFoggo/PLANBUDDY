@@ -1,11 +1,11 @@
 "use client";
-import MainNav from ".//main-nav";
-import MobileNav from "./mobile-nav";
-import LoginButton from "@/components/features/Auth/LoginButton";
-import { navItems } from "./constant";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
+import LoginButton from "@/components/features/Auth/LoginButton";
 import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
 import { useAuth } from "@/hooks/use-auth";
+import MainNav from ".//main-nav";
+import { navItems } from "./constant";
+import MobileNav from "./mobile-nav";
 
 const NavBar = () => {
   const { session, status } = useAuth();
@@ -21,7 +21,7 @@ const NavBar = () => {
       }
       <MobileNav items={navItems} />
       <div className="flex flex-1 items-center justify-end space-x-4">
-        {session ? <MeetingCUDialog manageType="create" /> : null}
+        {session ? <MeetingCUDialog manageType="create" isOwner={true} /> : null}
         <ThemeToggle />
         <LoginButton status={status} session={session} />
       </div>

@@ -1,14 +1,14 @@
 "use client";
 import { toast } from "sonner";
 
-import { Link } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
+import { Link } from "lucide-react";
 
 const MeetingCopy = ({ meetingId }: { meetingId: string }) => {
   const handleCopy = async () => {

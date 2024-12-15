@@ -1,14 +1,13 @@
 import { headers } from "next/headers";
 import { auth } from "../api/auth/[...nextauth]/route";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import Overview from "@/components/features/Dashboard/Overview";
 import MeetingList from "@/components/features/Dashboard/MeetingList";
+import Overview from "@/components/features/Dashboard/Overview";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { IMeetingData } from "@/types/dashboard";
-import { TABLIST } from "./constant";
 import PageTitle from "@/components/common/PageTitle";
 import { LayoutDashboard } from "lucide-react";
+import { TABLIST } from "./constant";
 
 const Dashboard = async () => {
   const session = await auth();

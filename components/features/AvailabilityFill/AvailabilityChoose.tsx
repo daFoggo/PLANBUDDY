@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import ParticipantList from "./ParticipantList";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { IMeeting } from "@/types/dashboard";
+import ParticipantList from "./ParticipantList";
 
 const AvailabilityChoose = ({meeting, isOwner }: {meeting: IMeeting, isOwner: boolean }) => {
 

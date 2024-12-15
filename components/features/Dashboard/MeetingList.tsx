@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { format, parseISO } from "date-fns";
 import {
   ArrowUpRight,
@@ -11,6 +10,7 @@ import {
   Video,
 } from "lucide-react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import ViewToggle from "@/components/common/ViewToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,19 +24,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { IMeetingListProps, IMeeting } from "@/types/dashboard";
+import { MEETING_TYPE } from "@/components/utils/constant";
 import {
   formatMeetingDateTime,
   getStatusColor,
 } from "@/components/utils/helper/meeting-list";
-import { Separator } from "@/components/ui/separator";
-import { MEETING_TYPE } from "@/components/utils/constant";
+import { IMeeting, IMeetingListProps } from "@/types/dashboard";
 
 const MeetingList = ({ meetingListData }: IMeetingListProps) => {
   const [currentView, setCurrentView] = useState<"list" | "grid">("list");

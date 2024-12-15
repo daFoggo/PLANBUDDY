@@ -1,5 +1,5 @@
-import { format, isThisWeek, parse, parseISO } from "date-fns";
 import { IMeeting } from "@/types/dashboard";
+import { format, isThisWeek, parse } from "date-fns";
 
 export const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {

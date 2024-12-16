@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { CalendarCog, CalendarPlus } from "lucide-react";
 import { useState } from "react";
-import MeetingMangeForm from "./MeetingCUForm";
+import MeetingCUForm from "./MeetingCUForm";
 
 import { useAuth } from "@/hooks/use-auth";
 import { IMeetingCUDialogProps } from "@/types/meeting-cu-dialog";
@@ -47,7 +47,7 @@ const MeetingCUDialog = ({
               ? "Schedule new meeting in just one minute!"
               : "Edit your meeting details"}
           </DialogDescription>
-          <MeetingMangeForm
+          <MeetingCUForm
             onClose={() => setIsOpen(false)}
             meetingData={meetingData}
           />

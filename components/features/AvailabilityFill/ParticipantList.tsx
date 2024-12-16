@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogTitle,
   DialogTrigger,
@@ -32,7 +33,7 @@ const ParticipantList = ({
         <h1 className="font-semibold text-xl">Participants</h1>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
         {participants.map((participant) => (
           <Participant
             key={participant?.id}
@@ -108,6 +109,7 @@ const Participant = ({
           </DialogTrigger>
           <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
             <DialogTitle>Delete confirm</DialogTitle>
+            <DialogDescription></DialogDescription>
             <p>Are you sure you want to delete this participant?</p>
             <DialogFooter>
               <DialogClose asChild>

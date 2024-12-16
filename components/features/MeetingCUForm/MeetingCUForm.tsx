@@ -43,6 +43,8 @@ import {
   DATE_TYPE,
   MEETING_STATUS,
   MEETING_TYPE,
+  PARTICIPANT_ROLE,
+  RESPONSE_STATUS,
 } from "@/components/utils/constant";
 import {
   filterCurrentWeekDates,
@@ -51,6 +53,7 @@ import {
 import { IMeetingCUForm } from "@/types/meeting-cu-form";
 import { toast } from "sonner";
 import { formSchema, steps, timeOptions, weekDays } from "./constant";
+import { IMeeting } from "@/types/dashboard";
 
 const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   const { session } = useAuth();
@@ -70,11 +73,17 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
       note: meetingData?.note || "",
 
       dateType: meetingData?.dateType || DATE_TYPE.WEEKLY,
-      proposedDates: meetingData?.proposedDates
-        ? meetingData.proposedDates.map((date) => new Date(date))
-        : [],
+      proposedDates: meetingData?.proposedDates?.map(normalizeDate) || [],
       startTime: meetingData?.startTime || "08:00",
       endTime: meetingData?.endTime || "19:00",
+      participants: meetingData?.participants || [
+        {
+          userId: session?.user?.id,
+          role: PARTICIPANT_ROLE.OWNER,
+          responseStatus: RESPONSE_STATUS.ACCEPTED,
+          timeZone: session?.user?.timeZone || undefined,
+        },
+      ],
     },
   });
 
@@ -104,7 +113,6 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(session);
     if (!session?.user?.id) {
       console.error("No user session found");
       return;
@@ -112,44 +120,29 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
 
     setIsLoading(true);
 
-    const createMeetingData = {
-      title: values.title,
-      description: values.description,
-      meetingType: values.meetingType,
-      location: values.location,
-      note: values.note,
-      dateType: values.dateType,
-      proposedDates: values.proposedDates.map(normalizeDate),
-      startTime: values.isAllDay ? "00:00" : values.startTime,
-      endTime: values.isAllDay ? "23:30" : values.endTime,
-      status: MEETING_STATUS.PUBLISHED,
-
-      availableSlots: values.proposedDates.map((date) => ({
-        date: normalizeDate(date),
-        startTime: values.isAllDay ? "00:00" : values.startTime,
-        endTime: values.isAllDay ? "23:30" : values.endTime,
-        timeZone: session.user.timeZone,
-      })),
-
-      participants: [
-        {
-          userId: session?.user?.id,
-          role: "OWNER",
-          responseStatus: "ACCEPTED",
-          timeZone: session.user.timeZone,
-        },
-      ],
-    };
-
     try {
       const response = await fetch("/api/meeting", {
         method: meetingData ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: meetingData
-          ? JSON.stringify({ ...createMeetingData, id: meetingData.id })
-          : JSON.stringify(createMeetingData),
+        body: (meetingData as IMeeting)
+          ? JSON.stringify({
+              id: meetingData?.id,
+              ...values,
+            })
+          : JSON.stringify({
+              ...values,
+              availableSlots:
+                meetingData?.availableSlots ||
+                values.proposedDates.map((date) => ({
+                  date: normalizeDate(date),
+                  startTime: values.isAllDay ? "00:00" : values.startTime,
+                  endTime: values.isAllDay ? "23:30" : values.endTime,
+                  timeZone: session.user.timeZone,
+                })),
+              status: MEETING_STATUS.PUBLISHED,
+            }),
       });
 
       if (response.ok) {
@@ -191,12 +184,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
         ))}
       </TabsList>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit((values) => {
-            onSubmit(values);
-          })}
-          className="space-y-6 mt-6"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
           <TabsContent value="Basic Infos" className="space-y-4 text-left">
             <FormField
               control={form.control}

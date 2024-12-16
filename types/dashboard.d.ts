@@ -9,7 +9,7 @@ import {
 } from "@/components/utils/constant";
 
 export interface IMeeting {
-  id: string;
+  id?: string;
   title: string;
   description: string?;
   meetingType: MEETING_TYPE;

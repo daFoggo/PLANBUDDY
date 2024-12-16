@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogTitle,
   DialogTrigger,
@@ -29,6 +30,7 @@ const MeetingDelete = ({ meetingId, isOwner }: { meetingId: string, isOwner: boo
       setIsLoading(false);
       toast.success("Meeting deleted successfully");
       router.push("/dashboard/");
+      router.refresh();
     } catch (error) {
       console.error("Error deleting meeting:", error);
       toast.error("Error deleting meeting");
@@ -48,6 +50,7 @@ const MeetingDelete = ({ meetingId, isOwner }: { meetingId: string, isOwner: boo
         </DialogTrigger>
         <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogTitle>Delete confirm</DialogTitle>
+          <DialogDescription></DialogDescription>
           <p>Are you sure you want to delete this meeting?</p>
           <DialogFooter>
             <DialogClose asChild>

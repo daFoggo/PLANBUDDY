@@ -20,7 +20,15 @@ export const formSchema = z.object({
 
   dateType: z.enum([DATE_TYPE.WEEKLY, DATE_TYPE.ANY]),
   proposedDates: z.array(z.date()).min(1, "At least one date is required"),
-
+  participants: z.array(
+    z.object({
+      userId: z.string(),
+      role: z.string(),
+      responseStatus: z.string(),
+      timeZone: z.string().optional(),
+    })
+  ).min(1, { message: "At least one participant is required" }),
+  availableSlots: z.array(z.object({})).optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
   isAllDay: z.boolean().optional(),

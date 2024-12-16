@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Select,
@@ -25,7 +31,13 @@ import { cn } from "@/lib/utils";
 import { ITimeSlot } from "@/types/availability-fill";
 import { IMeeting } from "@/types/dashboard";
 import { format } from "date-fns";
-import { Loader2, Pencil, RefreshCcw, SquarePlus } from "lucide-react";
+import {
+  ArrowRightFromLine,
+  Loader2,
+  Pencil,
+  RefreshCcw,
+  SquarePlus,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -55,6 +67,10 @@ const AvailabilityGrid = ({
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const gridTemplateColumns = useMemo(() => {
+    return `80px ${meeting.proposedDates.map(() => "1fr").join(" ")}`;
+  }, [meeting.proposedDates]);
 
   // Common slot from all users
   const commonSlotStatuses = (
@@ -332,40 +348,49 @@ const AvailabilityGrid = ({
   return (
     <Card className="col-span-2 p-4 space-y-4">
       <CardHeader className="p-0 flex flex-row justify-between items-center">
-        <CardTitle>Fill your availability</CardTitle>
+        <div className="gap-2">
+          <CardTitle className="flex items-center gap-2">
+            Fill your availability
+            <TooltipProvider>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-primary hover:bg-primary/30 hover:text-primary"
+                    onClick={() => {
+                      setIsRefreshing(true);
+                      try {
+                        router.refresh();
+                      } catch (error) {
+                        console.error("Error refreshing page:", error);
+                        toast.error("Error refreshing page. Please try again.");
+                      } finally {
+                        setIsRefreshing(false);
+                        toast.success("Page refreshed successfully");
+                      }
+                    }}
+                  >
+                    {isRefreshing ? (
+                      <RefreshCcw className="size-4 animate-spin" />
+                    ) : (
+                      <RefreshCcw className="size-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="border-primary">
+                  Refresh page
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </CardTitle>
+          <CardDescription>
+            {meeting.participants.length > 1
+              ? "The brightest green indicates that all participants are available at that time."
+              : ""}
+          </CardDescription>
+        </div>
         <div className="flex items-center space-x-2">
-          <TooltipProvider>
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="text-primary border-primary bg-primary/20 hover:bg-primary/30 hover:text-primary"
-                  onClick={() => {
-                    setIsRefreshing(true);
-                    try {
-                      router.refresh();
-                    } catch (error) {
-                      console.error("Error refreshing page:", error);
-                      toast.error("Error refreshing page. Please try again.");
-                    } finally {
-                      setIsRefreshing(false);
-                      toast.success("Page refreshed successfully");
-                    }
-                  }}
-                >
-                  {isRefreshing ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <RefreshCcw className="size-4" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="border-primary">
-                Refresh page
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
           {!isEditing ? (
             status === "authenticated" ? (
               <Button onClick={() => setIsEditing(true)}>
@@ -451,7 +476,10 @@ const AvailabilityGrid = ({
           className="relative border rounded-lg overflow-hidden w-full select-none"
           onMouseLeave={handleMouseUp}
         >
-          <div className="grid grid-cols-[80px_1fr_1fr_1fr] border-b bg-muted dark:bg-background">
+          <div
+            className={`grid border-b bg-muted dark:bg-background`}
+            style={{ gridTemplateColumns: gridTemplateColumns }}
+          >
             <div className="p-2 font-medium text-center"></div>
             {meeting.proposedDates.map((day, index) => (
               <div key={index} className="p-2 font-medium text-center border-l">
@@ -463,7 +491,10 @@ const AvailabilityGrid = ({
             ))}
           </div>
 
-          <div className="grid grid-cols-[80px_1fr_1fr_1fr]">
+          <div
+            className="grid"
+            style={{ gridTemplateColumns: gridTemplateColumns }}
+          >
             {availability.map((slot, rowIndex) => (
               <React.Fragment key={rowIndex}>
                 <div

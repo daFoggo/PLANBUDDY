@@ -9,8 +9,8 @@ enum MeetingType {
 }
 
 enum DateType {
-  WEEKLY 
-  ANY 
+  WEEKLY
+  ANY
 }
 
 enum ParticipantRole {

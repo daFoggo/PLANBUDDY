@@ -99,10 +99,10 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
               </Tooltip>
             </TooltipProvider>
           </div>
-          <CardTitle className="text-lg font-bold truncate">
+          <CardTitle className="text-lg font-bold truncate line-clamp-1">
             {meeting.title}
           </CardTitle>
-          <CardDescription>{meeting.description}</CardDescription>
+          <CardDescription className="line-clamp-2">{meeting.description}</CardDescription>
         </CardHeader>
         <CardContent className="p-0 pb-2"></CardContent>
         <CardFooter className="p-0">

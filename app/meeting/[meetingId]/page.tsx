@@ -19,12 +19,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { MEETING_TYPE } from "@/components/utils/constant";
 import {
   formatMeetingDateTime,
   getStatusColor,
 } from "@/components/utils/helper/meeting-list";
 import { IMeeting } from "@/types/dashboard";
-import { Calendar, CalendarSearch, Clock, Users } from "lucide-react";
+import {
+  Calendar,
+  CalendarSearch,
+  Clock,
+  MapPin,
+  MessageCircleWarning,
+  Users,
+} from "lucide-react";
+import { SiGooglemeet } from "react-icons/si";
+import Link from "next/link";
 
 const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
   try {
@@ -59,10 +69,12 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
 
         <Card className="flex flex-col p-4">
           <CardHeader className="p-0 flex flex-row justify-between items-center">
-            <div className="space-y-2">
+            <div className="space-y-2 w-1/2">
               <CardTitle className="flex flex-col space-y-2">
                 <div className="flex space-x-2 items-center">
-                  <h1 className="text-xl font-semibold">{meeting.title}</h1>
+                  <h1 className="text-xl font-semibold line-clamp-1">
+                    {meeting.title}
+                  </h1>
                   <Badge
                     className={`${getStatusColor(
                       meeting.status
@@ -73,6 +85,11 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
                 </div>
               </CardTitle>
 
+              <p className="text-sm line-clamp-1">{meeting.description}</p>
+              <div className="text-xs line-clamp-1 text-red-500 flex flex-row items-center gap-2">
+                <MessageCircleWarning className="size-4" />
+                <span>{meeting.note}</span>
+              </div>
               <CardDescription className="flex items-center space-x-2">
                 <div className="flex gap-2 items-center">
                   <Users className="size-4" />
@@ -113,6 +130,28 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground font-semibold">
                   <Clock className="size-4 text-foreground" />
                   <span>{time}</span>
+                </div>
+
+                <Separator orientation="vertical" className="h-4" />
+
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground font-semibold">
+                  {meeting.meetingType === MEETING_TYPE.INPERSON ? (
+                    <>
+                      <MapPin className="size-4" />
+                      <span className="line-clamp-1">{meeting?.location}</span>
+                    </>
+                  ) : (
+                    <>
+                      <SiGooglemeet className="size-4" />
+                      <a
+                        href={meeting?.location || ""}
+                        target="_blank"
+                        className="hover:underline"
+                      >
+                        Join meeting
+                      </a>
+                    </>
+                  )}
                 </div>
               </CardDescription>
             </div>

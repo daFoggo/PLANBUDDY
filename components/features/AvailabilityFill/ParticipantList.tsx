@@ -99,7 +99,7 @@ const Participant = ({
         />
         <AvatarFallback>{participant?.user.name.charAt(0)}</AvatarFallback>
       </Avatar>
-      <span className="font-semibold text-sm">{participant?.user.name}</span>
+      <span className={`font-semibold text-sm`}>{participant?.user.name}</span>
       {status === "authenticated" && isOwner && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>

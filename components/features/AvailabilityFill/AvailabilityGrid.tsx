@@ -5,10 +5,12 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -18,30 +20,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SLOT_STATUS } from "@/components/utils/constant";
+import { SLOT_STATUS, USER_TYPE } from "@/components/utils/constant";
 import { getHourDecimal } from "@/components/utils/helper/availability-fill";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { ITimeSlot } from "@/types/availability-fill";
-import { IMeeting } from "@/types/dashboard";
+import { IMeeting, IUser } from "@/types/dashboard";
 import { format } from "date-fns";
-import {
-  ArrowRightFromLine,
-  Loader2,
-  Pencil,
-  RefreshCcw,
-  SquarePlus,
-} from "lucide-react";
+import { Loader2, Pencil, RefreshCcw, SquarePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import LoginDialogContent from "../Auth/LoginDialogContent";
+import AddGoogleCalendar from "../AddGoogleCalendar";
 
 const AvailabilityGrid = ({
   meeting,
@@ -67,6 +65,7 @@ const AvailabilityGrid = ({
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showOnlyMatchingTime, setShowOnlyMatchingTime] = useState(false);
 
   const gridTemplateColumns = useMemo(() => {
     return `80px ${meeting.proposedDates.map(() => "1fr").join(" ")}`;
@@ -136,6 +135,10 @@ const AvailabilityGrid = ({
   const [availability, setAvailability] = useState<ITimeSlot[]>(timeSlots);
 
   const getSlotColor = (status: SLOT_STATUS, inDragSelection: boolean) => {
+    if (showOnlyMatchingTime && status !== SLOT_STATUS.AVAILABLE) {
+      return "bg-transparent";
+    }
+
     if (inDragSelection) {
       switch (status) {
         case SLOT_STATUS.AVAILABLE:
@@ -350,7 +353,7 @@ const AvailabilityGrid = ({
       <CardHeader className="p-0 flex flex-row justify-between items-center">
         <div className="gap-2">
           <CardTitle className="flex items-center gap-2">
-            Fill your availability
+            Your availability
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
@@ -390,10 +393,16 @@ const AvailabilityGrid = ({
               : ""}
           </CardDescription>
         </div>
+
         <div className="flex items-center space-x-2">
           {!isEditing ? (
             status === "authenticated" ? (
-              <Button onClick={() => setIsEditing(true)}>
+              <Button
+                onClick={() => {
+                  setShowOnlyMatchingTime(false);
+                  setIsEditing(true);
+                }}
+              >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit your availability
               </Button>
@@ -434,6 +443,16 @@ const AvailabilityGrid = ({
         </div>
       </CardHeader>
       <CardContent className="p-0 flex flex-col items-center space-y-4">
+        {!isEditing && (
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="show-matching-time"
+              checked={showOnlyMatchingTime}
+              onCheckedChange={setShowOnlyMatchingTime}
+            />
+            <Label htmlFor="show-matching-time">Show only matching time</Label>
+          </div>
+        )}
         {isEditing && (
           <div className="flex justify-center items-center gap-2">
             <p className="font-semibold shrink-0">Availability</p>
@@ -532,6 +551,17 @@ const AvailabilityGrid = ({
           </div>
         </div>
       </CardContent>
+      <CardFooter className="p-0 flex justify-end">
+        {status === "authenticated" &&
+          session?.user.userType === USER_TYPE.GOOGLE_USER && (
+            <AddGoogleCalendar
+              meeting={meeting}
+              user={session?.user as IUser}
+            />
+          )}
+      </CardFooter>
+
+      {/* Login popup for new participants */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent
           onOpenAutoFocus={(e) => e.preventDefault()}

@@ -38,8 +38,8 @@ import { Loader2, Pencil, RefreshCcw, SquarePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import LoginDialogContent from "../Auth/LoginDialogContent";
 import AddGoogleCalendar from "../AddGoogleCalendar";
+import LoginDialogContent from "../Auth/LoginDialogContent";
 
 const AvailabilityGrid = ({
   meeting,
@@ -163,7 +163,6 @@ const AvailabilityGrid = ({
         return "bg-gray-200";
     }
   };
-  
 
   // Map data to table
   useEffect(() => {
@@ -351,7 +350,7 @@ const AvailabilityGrid = ({
 
   return (
     <Card className="col-span-2 p-4 space-y-4">
-      <CardHeader className="p-0 flex flex-row justify-between items-center">
+      <CardHeader className="p-0 flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div className="gap-2">
           <CardTitle className="flex items-center gap-2">
             Your availability
@@ -443,7 +442,7 @@ const AvailabilityGrid = ({
           )}
         </div>
       </CardHeader>
-      <CardContent className="p-0 flex flex-col items-center space-y-4">
+      <CardContent className="p-0 flex flex-col items-start sm:items-center space-y-4">
         {!isEditing && (
           <div className="flex items-center space-x-2">
             <Switch
@@ -556,7 +555,6 @@ const AvailabilityGrid = ({
         {status === "authenticated" &&
           session?.user.userType === USER_TYPE.GOOGLE_USER && (
             <AddGoogleCalendar
-              meeting={meeting}
               user={session?.user as IUser}
             />
           )}

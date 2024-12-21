@@ -1,15 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { IMeeting, IUser } from "@/types/dashboard";
+import { IUser } from "@/types/dashboard";
 import { SiGooglecalendar } from "react-icons/si";
 
-const AddGoogleCalendar = ({
-  meeting,
-  user,
-}: {
-  meeting: IMeeting;
-  user: IUser;
-}) => {
+const AddGoogleCalendar = ({}: { user: IUser }) => {
   return (
     <Button
       variant="outline"

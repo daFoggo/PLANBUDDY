@@ -1,6 +1,3 @@
-import { headers } from "next/headers";
-import { notFound } from "next/navigation";
-
 import { auth } from "@/app/api/auth/[...nextauth]/route";
 import PageTitle from "@/components/common/PageTitle";
 import AvailabilityChoose from "@/components/features/AvailabilityFill/AvailabilityChoose";
@@ -25,16 +22,10 @@ import {
   getStatusColor,
 } from "@/components/utils/helper/meeting-list";
 import { IMeeting } from "@/types/dashboard";
-import {
-  Calendar,
-  CalendarSearch,
-  Clock,
-  MapPin,
-  MessageCircleWarning,
-  Users,
-} from "lucide-react";
+import { Calendar, CalendarSearch, Clock, MapPin, MessageCircleWarning, Users } from 'lucide-react';
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { SiGooglemeet } from "react-icons/si";
-import Link from "next/link";
 
 const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
   try {
@@ -64,36 +55,36 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
     const { date, time } = formatMeetingDateTime(meeting);
 
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-6">
         <PageTitle name="Meeting detail" icon={<CalendarSearch />} />
 
         <Card className="flex flex-col p-4">
-          <CardHeader className="p-0 flex flex-row justify-between items-center">
-            <div className="space-y-2 w-1/2">
+          <CardHeader className="p-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+            <div className="space-y-2 w-full sm:w-1/2">
               <CardTitle className="flex flex-col space-y-2">
-                <div className="flex space-x-2 items-center">
-                  <h1 className="text-xl font-semibold line-clamp-1">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <h1 className="text-lg sm:text-xl font-semibold line-clamp-1">
                     {meeting.title}
                   </h1>
                   <Badge
                     className={`${getStatusColor(
                       meeting.status
-                    )} text-white rounded-md`}
+                    )} text-white rounded-md text-xs sm:text-sm w-fit`}
                   >
                     <p>{meeting.status}</p>
                   </Badge>
                 </div>
               </CardTitle>
 
-              <p className="text-sm line-clamp-1">{meeting.description}</p>
-              <div className="text-xs line-clamp-1 text-red-500 flex flex-row items-center gap-2">
-                <MessageCircleWarning className="size-4" />
+              <p className="text-sm line-clamp-2">{meeting.description}</p>
+              <div className="text-xs line-clamp-2 text-red-500 flex flex-row items-center gap-2">
+                <MessageCircleWarning className="size-4 flex-shrink-0" />
                 <span>{meeting.note}</span>
               </div>
-              <CardDescription className="flex items-center space-x-2">
+              <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <div className="flex gap-2 items-center">
-                  <Users className="size-4" />
-                  <div className="flex space-x-2">
+                  <Users className="size-4 flex-shrink-0" />
+                  <div className="flex -space-x-1">
                     {meeting.participants.slice(0, 5).map((participant) => (
                       <Avatar
                         key={participant.id}
@@ -108,41 +99,41 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
                         </AvatarFallback>
                       </Avatar>
                     ))}
-                    {meeting.participants.length > 3 && (
+                    {meeting.participants.length > 5 && (
                       <Avatar className="h-6 w-6 border-2 border-background">
                         <AvatarFallback>
-                          +{meeting.participants.length - 3}
+                          +{meeting.participants.length - 5}
                         </AvatarFallback>
                       </Avatar>
                     )}
                   </div>
                 </div>
 
-                <Separator orientation="vertical" className="h-4" />
+                <Separator orientation="vertical" className="h-4 hidden sm:block" />
 
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground font-semibold">
-                  <Calendar className="size-4 text-foreground" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground font-semibold">
+                  <Calendar className="size-4 text-foreground flex-shrink-0" />
                   <span>{date}</span>
                 </div>
 
-                <Separator orientation="vertical" className="h-4" />
+                <Separator orientation="vertical" className="h-4 hidden sm:block" />
 
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground font-semibold">
-                  <Clock className="size-4 text-foreground" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground font-semibold">
+                  <Clock className="size-4 text-foreground flex-shrink-0" />
                   <span>{time}</span>
                 </div>
 
-                <Separator orientation="vertical" className="h-4" />
+                <Separator orientation="vertical" className="h-4 hidden sm:block" />
 
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground font-semibold">
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground font-semibold">
                   {meeting.meetingType === MEETING_TYPE.INPERSON ? (
                     <>
-                      <MapPin className="size-4" />
+                      <MapPin className="size-4 flex-shrink-0" />
                       <span className="line-clamp-1">{meeting?.location}</span>
                     </>
                   ) : (
                     <>
-                      <SiGooglemeet className="size-4" />
+                      <SiGooglemeet className="size-4 flex-shrink-0" />
                       <a
                         href={meeting?.location || ""}
                         target="_blank"
@@ -155,7 +146,7 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
                 </div>
               </CardDescription>
             </div>
-            <div className="space-x-2 flex items-center">
+            <div className="flex flex-wrap gap-2 sm:space-x-2 sm:flex-nowrap">
               <MeetingQRGen meetingId={params.meetingId} />
               <MeetingCopy meetingId={params.meetingId} />
               <MeetingDelete meetingId={params.meetingId} isOwner={isOwner} />
@@ -169,7 +160,7 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
           <CardContent className="flex items-center space-x-4 p-0"></CardContent>
         </Card>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <AvailabilityGrid meeting={meeting} isOwner={isOwner} />
           <AvailabilityChoose meeting={meeting} isOwner={isOwner} />
         </div>
@@ -182,3 +173,4 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
 };
 
 export default MeetingDetail;
+

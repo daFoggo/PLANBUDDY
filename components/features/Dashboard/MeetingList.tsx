@@ -1,14 +1,7 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import {
-  ArrowUpRight,
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  Video,
-} from "lucide-react";
+import { ArrowUpRight, Calendar, Clock, MapPin, Users, Video } from 'lucide-react';
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -78,20 +71,20 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
                 meeting.status
               )} text-white rounded-md`}
             >
-              <p>{meeting.status}</p>
+              <p className="text-xs sm:text-sm">{meeting.status}</p>
             </Badge>
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
                     {meeting?.meetingType === MEETING_TYPE.ONLINE ? (
-                      <Video className="size-4" />
+                      <Video className="size-4 sm:size-5" />
                     ) : (
-                      <MapPin className="size-4" />
+                      <MapPin className="size-4 sm:size-5" />
                     )}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent align="center" className="text-xs">
+                <TooltipContent align="center" className="text-xs sm:text-sm">
                   {meeting?.meetingType === MEETING_TYPE.INPERSON
                     ? "Online Meeting"
                     : "In-person Meeting"}
@@ -99,22 +92,22 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
               </Tooltip>
             </TooltipProvider>
           </div>
-          <CardTitle className="text-lg font-bold truncate line-clamp-1">
+          <CardTitle className="text-base sm:text-lg font-bold truncate line-clamp-1">
             {meeting.title}
           </CardTitle>
-          <CardDescription className="line-clamp-2">{meeting.description}</CardDescription>
+          <CardDescription className="text-xs sm:text-sm line-clamp-2">{meeting.description}</CardDescription>
         </CardHeader>
         <CardContent className="p-0 pb-2"></CardContent>
         <CardFooter className="p-0">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center space-x-4">
-              <div className="flex gap-2 items-center">
-                <Users className="size-4" />
-                <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-2 sm:gap-0">
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Users className="size-3 sm:size-4" />
+                <div className="flex -space-x-1 sm:-space-x-2">
                   {meeting.participants.slice(0, 5).map((participant) => (
                     <Avatar
                       key={participant.id}
-                      className="h-6 w-6 border-2 border-background"
+                      className="h-5 w-5 sm:h-6 sm:w-6 border-2 border-background"
                     >
                       <AvatarImage
                         src={participant.user.image}
@@ -126,34 +119,35 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
                     </Avatar>
                   ))}
 
-                  {meeting.participants.length > 3 && (
-                    <Avatar className="h-6 w-6 border-2 border-background">
+                  {meeting.participants.length > 5 && (
+                    <Avatar className="h-5 w-5 sm:h-6 sm:w-6 border-2 border-background">
                       <AvatarFallback>
-                        +{meeting.participants.length - 3}
+                        +{meeting.participants.length - 5}
                       </AvatarFallback>
                     </Avatar>
                   )}
                 </div>
               </div>
 
-              <Separator orientation="vertical" className="h-4" />
+              <Separator orientation="vertical" className="h-4 hidden sm:block" />
 
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground font-semibold">
-                <Calendar className="size-4 text-foreground" />
+              <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground font-semibold">
+                <Calendar className="size-3 sm:size-4 text-foreground" />
                 <span>{date}</span>
               </div>
 
-              <Separator orientation="vertical" className="h-4" />
+              <Separator orientation="vertical" className="h-4 hidden sm:block" />
 
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground font-semibold">
-                <Clock className="size-4 text-foreground" />
+              <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground font-semibold">
+                <Clock className="size-3 sm:size-4 text-foreground" />
                 <span>{time}</span>
               </div>
             </div>
-            <Link href={`/meeting/${meeting.id}`}>
+            <Link href={`/meeting/${meeting.id}`} className="w-full sm:w-auto">
               <Button
                 variant="outline"
-                rightIcon={<ArrowUpRight className="size-4" />}
+                className="w-full sm:w-auto text-xs sm:text-sm"
+                rightIcon={<ArrowUpRight className="size-3 sm:size-4" />}
               >
                 View Details
               </Button>
@@ -170,13 +164,13 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
         <ViewToggle onViewChange={setCurrentView} defaultView={currentView} />
       </div>
       {sortedMeetings.length === 0 ? (
-        <div className="text-center text-lg font-semibold text-muted-foreground">
+        <div className="text-center text-base sm:text-lg font-semibold text-muted-foreground">
           No meetings found. Create or join a meeting to get started :)
         </div>
       ) : (
         Object.entries(groupedMeetings).map(([date, meetings]) => (
           <div key={date} className="space-y-2">
-            <h1 className="text-lg font-semibold sticky top-0 bg-background z-10">
+            <h1 className="text-base sm:text-lg font-semibold sticky top-0 bg-background z-10 py-2">
               Created at {format(parseISO(date), "MMMM d, yyyy")}
             </h1>
             <div
@@ -196,3 +190,4 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
 };
 
 export default MeetingList;
+

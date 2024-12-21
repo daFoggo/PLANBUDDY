@@ -35,7 +35,7 @@ const Dashboard = async () => {
   return (
     <div className="flex flex-col gap-6">
       <PageTitle name="Dashboard" icon={<LayoutDashboard />} />
-      <Tabs defaultValue="overview">
+      <Tabs defaultValue="overview" className="self-center sm:self-start sm:w-full">
         <TabsList>
           {TABLIST.map((tab, index) => (
             <TabsTrigger key={index} value={tab.value}>

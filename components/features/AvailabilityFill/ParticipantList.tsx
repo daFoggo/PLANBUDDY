@@ -77,7 +77,7 @@ const Participant = ({
         if (response.ok) {
           toast.success("Participant deleted successfully");
           setIsDialogOpen(false);
-          router.refresh(); 
+          router.refresh();
         }
       } catch (error) {
         toast.error("Failed to delete participant");
@@ -107,11 +107,14 @@ const Participant = ({
               <UserRoundX className="size-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+          <DialogContent
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            className="w-[95%] sm:w-[625px] rounded-lg"
+          >
             <DialogTitle>Delete confirm</DialogTitle>
             <DialogDescription></DialogDescription>
             <p>Are you sure you want to delete this participant?</p>
-            <DialogFooter>
+            <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:gap-0">
               <DialogClose asChild>
                 <Button
                   variant="outline"

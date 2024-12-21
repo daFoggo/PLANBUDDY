@@ -43,7 +43,7 @@ const MeetingQRGen = ({ meetingId }: { meetingId: string }) => {
           <QrCode className="size-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-[95%] sm:w-[625px] rounded-lg">
         <DialogHeader>
           <DialogTitle>Meeting QR Code</DialogTitle>
           <DialogDescription>

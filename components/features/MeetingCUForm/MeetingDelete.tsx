@@ -15,7 +15,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const MeetingDelete = ({ meetingId, isOwner }: { meetingId: string, isOwner: boolean }) => {
+const MeetingDelete = ({
+  meetingId,
+  isOwner,
+}: {
+  meetingId: string;
+  isOwner: boolean;
+}) => {
   const { status } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -48,11 +54,14 @@ const MeetingDelete = ({ meetingId, isOwner }: { meetingId: string, isOwner: boo
             <Trash2 className="size-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+        <DialogContent
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="w-[95%] sm:w-[625px] rounded-lg"
+        >
           <DialogTitle>Delete confirm</DialogTitle>
           <DialogDescription></DialogDescription>
           <p>Are you sure you want to delete this meeting?</p>
-          <DialogFooter>
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:gap-0">
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>

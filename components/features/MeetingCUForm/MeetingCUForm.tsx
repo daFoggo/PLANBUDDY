@@ -93,8 +93,9 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
       const isAllDay =
         meetingData.startTime === "00:00" && meetingData.endTime === "23:30";
       setIsAllDay(isAllDay);
+      form.setValue("isAllDay", isAllDay);
     }
-  }, [meetingData]);
+  }, [meetingData, form]);
 
   //debug form
   // useEffect(() => {
@@ -404,14 +405,18 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
             <FormField
               control={form.control}
               name="isAllDay"
-              render={({ field }) => (
+              render={({}) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       checked={isAllDay}
                       onCheckedChange={(checked) => {
                         setIsAllDay(checked as boolean);
-                        field.onChange(checked);
+                        form.setValue("isAllDay", checked as boolean);
+                        if (checked) {
+                          form.setValue("startTime", "00:00");
+                          form.setValue("endTime", "23:30");
+                        }
                       }}
                     />
                   </FormControl>

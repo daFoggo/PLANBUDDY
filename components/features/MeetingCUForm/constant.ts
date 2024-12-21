@@ -31,5 +31,5 @@ export const formSchema = z.object({
   availableSlots: z.array(z.object({})).optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
-  isAllDay: z.boolean().optional(),
+  isAllDay: z.boolean().optional().default(false),
 });

@@ -45,12 +45,6 @@ const UserMenu = ({ session }: any) => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <Link href="/profile" className="w-full">
-          <DropdownMenuItem>
-            <User className="w-4 h-4 mr-2" />
-            Profile
-          </DropdownMenuItem>
-        </Link>
         <DropdownMenuItem>
           <Settings className="w-4 h-4 mr-2" />
           Settings

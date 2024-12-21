@@ -1,53 +1,46 @@
 # PROJECT STRUCTURE 
 ```
-└── 📁lets-meat
+└── 📁1min2meet
     └── 📁app
-        // router
-        └── 📁admin
-            └── layout.tsx
-            └── page.tsx
-        └── 📁auth
-            └── 📁login
-                └── page.tsx
-            └── 📁register
-                └── page.tsx
-            └── layout.tsx
         └── 📁fonts
-            └── GeistMonoVF.woff
-            └── GeistVF.woff
-        └── favicon.ico
         └── globals.css
-        //root layout + root page
-        └── layout.tsx
+        └── layout.tsx // root layout
+        └── 📁api // api routing
+        └── auth.ts
+        └── 📁dashboard // page routing
+        └── 📁meeting
+            └── 📁[meetingId] // dynamic page routing
+                └── page.tsx
         └── page.tsx
     └── 📁components
-        // your reuse components
         └── 📁common
-            └── 📁ThemeProvider
-                └── theme-provider.tsx
-            └── 📁ThemeToggle
-                └── theme-toggle.tsx
-        // components for special features
-        └── 📁features
-        // shadcn components
-        └── 📁ui
-            └── button.tsx
-            └── dropdown-menu.tsx
-    └── 📁helper
+        └── 📁features // special components for each page
+            └── 📁AddGoogleCalendar
+            └── 📁Auth
+            └── 📁AvailabilityFill
+            └── 📁Dashboard
+            └── 📁MeetingCUForm
+        └── 📁Layout // special components for layojt
+            └── 📁Footer
+            └── 📁Navbar
+        └── 📁ui // shadcn's components
+        └── 📁utils
+            └── constant.ts
+            └── 📁helper
     └── 📁hooks
     └── 📁lib
-        └── utils.ts
-    └── 📁services
-    └── 📁types
-    └── .eslintrc.json
-    └── .gitignore
-    └── components.json
-    └── next-env.d.ts
-    └── next.config.mjs
-    └── package-lock.json
-    └── package.json
-    └── postcss.config.mjs
-    └── README.md
-    └── tailwind.config.ts
-    └── tsconfig.json
+        └── meeting.ts // api service functions
+        └── prisma.ts // db connect
+        └── utils.ts 
+    └── 📁prisma
+        └── 📁migrations
+        └── 📁schema 
+            └── schema.prisma
+            └── auth.prisma
+            └── meeting.prisma
+            ...
+    └── 📁public // public assets
+        └── 📁icons
+    └── 📁types // typescript interfaces
+    ...
 ```

@@ -454,12 +454,28 @@ export async function DELETE(req: NextRequest) {
       }
 
       // Delete participant
-      await prisma.meetingParticipant.delete({
+      const participant = await prisma.meetingParticipant.findUnique({
         where: { id: participantId },
       });
 
+      if (!participant) {
+        return NextResponse.json(
+          { error: "Participant not found" },
+          { status: 404 }
+        );
+      }
+
+      // Delete participant's slots
       await prisma.availableSlot.deleteMany({
-        where: { userId: session.user.id },
+        where: {
+          userId: participant.userId,
+          meetingId: meetingId,
+        },
+      });
+
+      // Delete participant
+      await prisma.meetingParticipant.delete({
+        where: { id: participantId },
       });
 
       return NextResponse.json(

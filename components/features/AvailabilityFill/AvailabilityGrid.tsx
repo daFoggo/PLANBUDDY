@@ -163,6 +163,7 @@ const AvailabilityGrid = ({
         return "bg-gray-200";
     }
   };
+  
 
   // Map data to table
   useEffect(() => {

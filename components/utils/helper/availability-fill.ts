@@ -27,3 +27,24 @@ export const getHourDecimal = (timeString: string): number => {
   const [hours, minutes] = timeString.split(":");
   return Number(hours) + Number(minutes) / 60;
 };
+
+export const isInSelection = (
+  rowIndex: number,
+  colIndex: number,
+  start: { row: number; col: number } | null,
+  end: { row: number; col: number } | null
+) => {
+  if (!start || !end) return false;
+
+  const startRow = Math.min(start.row, end.row);
+  const endRow = Math.max(start.row, end.row);
+  const startCol = Math.min(start.col, end.col);
+  const endCol = Math.max(start.col, end.col);
+
+  return (
+    rowIndex >= startRow &&
+    rowIndex <= endRow &&
+    colIndex >= startCol &&
+    colIndex <= endCol
+  );
+};

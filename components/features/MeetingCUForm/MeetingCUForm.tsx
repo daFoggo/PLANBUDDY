@@ -50,10 +50,10 @@ import {
   filterCurrentWeekDates,
   normalizeDate,
 } from "@/components/utils/helper/meeting-cu-form";
+import { IMeeting } from "@/types/dashboard";
 import { IMeetingCUForm } from "@/types/meeting-cu-form";
 import { toast } from "sonner";
 import { formSchema, steps, timeOptions, weekDays } from "./constant";
-import { IMeeting } from "@/types/dashboard";
 
 const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   const { session } = useAuth();

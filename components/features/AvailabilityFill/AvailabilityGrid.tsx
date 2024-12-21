@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,13 +29,22 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SLOT_STATUS, USER_TYPE } from "@/components/utils/constant";
-import { getHourDecimal } from "@/components/utils/helper/availability-fill";
+import {
+  getHourDecimal,
+  isInSelection,
+} from "@/components/utils/helper/availability-fill";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { ITimeSlot } from "@/types/availability-fill";
-import { IMeeting, IUser } from "@/types/dashboard";
+import { IMeeting } from "@/types/dashboard";
 import { format } from "date-fns";
-import { Loader2, Pencil, RefreshCcw, SquarePlus } from "lucide-react";
+import {
+  Loader2,
+  Pencil,
+  RefreshCcw,
+  SquarePlus,
+  Terminal,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -43,7 +53,6 @@ import LoginDialogContent from "../Auth/LoginDialogContent";
 
 const AvailabilityGrid = ({
   meeting,
-  isOwner,
 }: {
   meeting: IMeeting;
   isOwner: boolean;
@@ -66,7 +75,17 @@ const AvailabilityGrid = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showOnlyMatchingTime, setShowOnlyMatchingTime] = useState(false);
+  const [isGgCalendarSelecting, setIsGgCalendarSelecting] = useState(false);
+  const [isGgCalendarDragging, setIsGgCalendarDragging] = useState(false);
+  const [ggcalendarSelection, setGgCalendarSelection] = useState<{
+    start: { row: number; col: number } | null;
+    end: { row: number; col: number } | null;
+  }>({
+    start: null,
+    end: null,
+  });
 
+  // Render table
   const gridTemplateColumns = useMemo(() => {
     return `80px ${meeting.proposedDates.map(() => "1fr").join(" ")}`;
   }, [meeting.proposedDates]);
@@ -78,7 +97,6 @@ const AvailabilityGrid = ({
   ): ITimeSlot[] => {
     const commonSlots = [...slots];
 
-    // Count total number of users
     const totalUsers = new Set(availableSlots.map((slot) => slot.userId)).size;
 
     commonSlots.forEach((slot, slotIndex) => {
@@ -107,7 +125,7 @@ const AvailabilityGrid = ({
     return commonSlots;
   };
 
-  // Create time slots based on meeting's time
+  // Render time slot with status
   const timeSlots: ITimeSlot[] = useMemo(() => {
     const slots = [];
     const startHour = getHourDecimal(meeting.startTime);
@@ -134,7 +152,31 @@ const AvailabilityGrid = ({
 
   const [availability, setAvailability] = useState<ITimeSlot[]>(timeSlots);
 
-  const getSlotColor = (status: SLOT_STATUS, inDragSelection: boolean) => {
+  // Render slot color
+  const getSlotColor = (
+    status: SLOT_STATUS,
+    inDragSelection: boolean,
+    rowIndex?: number,
+    colIndex?: number
+  ) => {
+    if (
+      isGgCalendarSelecting &&
+      ggcalendarSelection.start &&
+      ggcalendarSelection.end &&
+      typeof rowIndex === "number" &&
+      typeof colIndex === "number"
+    ) {
+      const isInCalendarSelection = isInSelection(
+        rowIndex,
+        colIndex,
+        ggcalendarSelection.start,
+        ggcalendarSelection.end
+      );
+      if (isInCalendarSelection) {
+        return "bg-primary/30";
+      }
+    }
+
     if (showOnlyMatchingTime && status !== SLOT_STATUS.AVAILABLE) {
       return "bg-transparent";
     }
@@ -172,14 +214,14 @@ const AvailabilityGrid = ({
     }));
 
     if (meeting.availableSlots && meeting.availableSlots.length > 0) {
-      // Default view: aggregated statuses
+      // Default view: common slots
       if (!isEditing) {
         initialAvailability = commonSlotStatuses(
           initialAvailability,
           meeting.availableSlots
         );
       }
-      // Edit view: current user's slots
+      // Edit view: user's slots
       else {
         const userSlots = meeting.availableSlots.filter(
           (slot) => slot.userId === session?.user?.id
@@ -218,6 +260,13 @@ const AvailabilityGrid = ({
     session?.user?.id,
     meeting.proposedDates,
   ]);
+
+  useEffect(() => {
+    return () => {
+      setIsGgCalendarDragging(false);
+      setGgCalendarSelection({ start: null, end: null });
+    };
+  }, []);
 
   const handleSaveAvailability = async () => {
     setIsSaving(true);
@@ -271,18 +320,6 @@ const AvailabilityGrid = ({
     }
   };
 
-  const handleMouseDown = (rowIndex: number, colIndex: number) => {
-    if (!isEditing) return;
-
-    setIsDragging(true);
-    setDragStart({ row: rowIndex, col: colIndex });
-    setDragEnd({ row: rowIndex, col: colIndex });
-
-    const currentStatus = availability[rowIndex].status[colIndex];
-    const newStatus = determineNextStatus(currentStatus);
-    updateSlotStatus(rowIndex, colIndex, newStatus);
-  };
-
   const determineNextStatus = (currentStatus: SLOT_STATUS): SLOT_STATUS => {
     switch (currentStatus) {
       case SLOT_STATUS.AVAILABLE:
@@ -306,7 +343,35 @@ const AvailabilityGrid = ({
     setAvailability(newAvailability);
   };
 
+  const handleMouseDown = (rowIndex: number, colIndex: number) => {
+    if (!isEditing && !isGgCalendarSelecting) return;
+
+    if (isGgCalendarSelecting) {
+      setIsGgCalendarDragging(true);
+      setGgCalendarSelection({
+        start: { row: rowIndex, col: colIndex },
+        end: { row: rowIndex, col: colIndex },
+      });
+    } else {
+      setIsDragging(true);
+      setDragStart({ row: rowIndex, col: colIndex });
+      setDragEnd({ row: rowIndex, col: colIndex });
+
+      const currentStatus = availability[rowIndex].status[colIndex];
+      const newStatus = determineNextStatus(currentStatus);
+      updateSlotStatus(rowIndex, colIndex, newStatus);
+    }
+  };
+
   const handleMouseEnter = (rowIndex: number, colIndex: number) => {
+    if (isGgCalendarSelecting && isGgCalendarDragging) {
+      setGgCalendarSelection({
+        ...ggcalendarSelection,
+        end: { row: rowIndex, col: colIndex },
+      });
+      return;
+    }
+
     if (!isDragging) return;
 
     setDragEnd({ row: rowIndex, col: colIndex });
@@ -327,6 +392,11 @@ const AvailabilityGrid = ({
   };
 
   const handleMouseUp = () => {
+    if (isGgCalendarSelecting) {
+      setIsGgCalendarDragging(false);
+      return;
+    }
+
     setIsDragging(false);
     setDragStart(null);
     setDragEnd(null);
@@ -346,6 +416,15 @@ const AvailabilityGrid = ({
       colIndex >= startCol &&
       colIndex <= endCol
     );
+  };
+
+  const handleCalendarSelectionStart = () => {
+    setIsGgCalendarSelecting(true);
+  };
+
+  const handleCalendarSelectionEnd = () => {
+    setIsGgCalendarSelecting(false);
+    setGgCalendarSelection({ start: null, end: null });
   };
 
   return (
@@ -535,7 +614,9 @@ const AvailabilityGrid = ({
                         "transition-colors duration-100",
                         getSlotColor(
                           status,
-                          isInDragSelection(rowIndex, colIndex)
+                          isInDragSelection(rowIndex, colIndex),
+                          rowIndex,
+                          colIndex
                         )
                       )}
                       onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
@@ -551,13 +632,33 @@ const AvailabilityGrid = ({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="p-0 flex justify-end">
-        {status === "authenticated" &&
-          session?.user.userType === USER_TYPE.GOOGLE_USER && (
-            <AddGoogleCalendar
-              user={session?.user as IUser}
-            />
-          )}
+      <CardFooter className="p-0 flex flex-col gap-2">
+        {isGgCalendarSelecting && (
+          <Alert>
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Heads up!</AlertTitle>
+            <AlertDescription>
+              To add to Google Calendar, click and drag on the table to select
+              your preferred time range.
+            </AlertDescription>
+          </Alert>
+        )}
+        <div className="self-end">
+          {status === "authenticated" &&
+            session?.user.userType === USER_TYPE.GOOGLE_USER && (
+              <AddGoogleCalendar
+                meeting={meeting}
+                availability={availability}
+                proposedDates={meeting.proposedDates}
+                onSelectionStart={handleCalendarSelectionStart}
+                onSelectionEnd={handleCalendarSelectionEnd}
+                selection={ggcalendarSelection}
+                isSelectionValid={
+                  !!ggcalendarSelection.start && !!ggcalendarSelection.end
+                }
+              />
+            )}
+        </div>
       </CardFooter>
 
       {/* Login popup for new participants */}

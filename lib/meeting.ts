@@ -1,5 +1,5 @@
-import { prisma } from "./prisma";
 import { PARTICIPANT_ROLE } from "@/components/utils/constant";
+import { prisma } from "./prisma";
 
 export async function getMeetingById(meetingId: string) {
   return prisma.meeting.findUnique({

@@ -1,22 +1,25 @@
-import Logo from "@/components/common/Logo";
-import Image from "next/image";
+import Features from "@/components/Layout/LandingPage/feature";
+import Hero from "@/components/Layout/LandingPage/hero";
+import HowItWorks from "@/components/Layout/LandingPage/howitworks";
+import Testimonials from "@/components/Layout/LandingPage/testimonials";
+import { redirect } from "next/navigation";
+import { auth } from "./auth";
 
-export default function Home() {
+const Home = async () => {
+  const session = await auth();
+
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
-    <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-      <div className="flex space-x-6 items-center justify-center">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={0}
-          height={0}
-          style={{ width: 100, height: 100 }}
-          priority
-        />
-        <p>X</p>
-        <Logo />
-      </div>
-    </div>
+    <main>
+      <Hero />
+      <Features />
+      <HowItWorks />
+      <Testimonials />
+    </main>
   );
-}
+};
+
+export default Home;

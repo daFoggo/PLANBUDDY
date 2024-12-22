@@ -18,12 +18,15 @@ import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
 import { IGuestLoginFormProps } from "@/types/guest-login-form";
+import { usePathname, useRouter } from "next/navigation";
 import { formSchema } from "./constant";
 
 type FormValues = z.infer<typeof formSchema>;
 
 const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -48,6 +51,9 @@ const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
         });
       } else if (result?.ok) {
         onClose();
+        if (pathname === "/") {
+          router.push("/dashboard");
+        }
       }
     } catch (error) {
       form.setError("root", {
@@ -80,18 +86,14 @@ const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
             </FormItem>
           )}
         />
-        
+
         {form.formState.errors.root && (
           <p className="text-sm text-red-500">
             {form.formState.errors.root.message}
           </p>
         )}
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={isLoading}
-        >
+        <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader2 className="size-4 animate-spin" />

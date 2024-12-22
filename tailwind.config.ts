@@ -11,7 +11,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         inter: ["var(--font-inter)"],
-		clash: ["var(--font-clash)"],
+        clash: ["var(--font-clash)"],
       },
       colors: {
         background: "hsl(var(--background))",
@@ -69,6 +69,41 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+    },
+    animation: {
+      "fade-in-down": "fadeInDown 0.5s ease-out",
+      "fade-in-up": "fadeInUp 0.5s ease-out",
+      gradient: "gradient 3s ease infinite",
+    },
+    keyframes: {
+      fadeInDown: {
+        "0%": { opacity: "0", transform: "translateY(-10px)" },
+        "100%": { opacity: "1", transform: "translateY(0)" },
+      },
+      fadeInUp: {
+        "0%": { opacity: "0", transform: "translateY(10px)" },
+        "100%": { opacity: "1", transform: "translateY(0)" },
+      },
+      gradient: {
+        "0%, 100%": {
+          "background-size": "200% 200%",
+          "background-position": "left center",
+        },
+        "50%": {
+          "background-size": "200% 200%",
+          "background-position": "right center",
+        },
+      },
+      bounce: {
+        '0%, 100%': {
+          transform: 'translateY(-25%)',
+          animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)',
+        },
+        '50%': {
+          transform: 'translateY(0)',
+          animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
+        },
       },
     },
   },

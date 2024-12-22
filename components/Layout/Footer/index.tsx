@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Github, Mail } from "lucide-react";
+import {  Mail } from "lucide-react";
+import { IoLogoGithub } from "react-icons/io";
 import Link from "next/link";
 import ContactForm from "./contact-form";
 
@@ -11,7 +12,7 @@ const Footer = () => {
         <div className="flex flex-col gap-4 items-center md:items-start">
           <Link href="https://github.com/daFoggo/1Min2Meet.git">
             <Button size="sm" className="w-full md:w-auto">
-              <Github className="size-4" />
+              <IoLogoGithub className="size-4" />
               Github
             </Button>
           </Link>

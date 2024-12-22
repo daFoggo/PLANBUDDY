@@ -3,7 +3,7 @@ import Hero from "@/components/Layout/LandingPage/hero";
 import HowItWorks from "@/components/Layout/LandingPage/howitworks";
 import Testimonials from "@/components/Layout/LandingPage/testimonials";
 import { redirect } from "next/navigation";
-import { auth } from "./auth";
+import { auth } from "../auth";
 
 const Home = async () => {
   const session = await auth();

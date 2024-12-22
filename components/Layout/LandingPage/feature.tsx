@@ -1,19 +1,23 @@
+import { getTranslations } from "next-intl/server";
 import {
   Card,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { features } from "./constant";
+import { getFeatures } from "./constant";
 
-const Features = () => {
+const Features = async () => {
+  const t = await getTranslations("Landing.Features");
+  const features = await getFeatures();
+
   return (
     <section className="container mx-auto p-6 bg-gradient-to-br from-muted/50 to-muted/30 rounded-lg shadow-sm">
-      <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">Key Features</h2>
+      <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">
+        {t("title")}
+      </h2>
       <p className="text-center text-sm sm:text-base text-muted-foreground mb-12 font-semibold mx-auto">
-        Discover how 1MIN2MEET revolutionizes your meeting planning experience with these powerful features.
+        {t("description")}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature, index) => (
@@ -36,4 +40,3 @@ const Features = () => {
 };
 
 export default Features;
-

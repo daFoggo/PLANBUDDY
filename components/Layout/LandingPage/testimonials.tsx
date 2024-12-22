@@ -1,19 +1,21 @@
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { testimonials } from "./constant";
 import { QuoteIcon } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import { getTestimonials } from "./constant";
 
-const Testimonials = () => {
+const Testimonials = async () => {
+  const t = await getTranslations("Landing.Testimonials");
+  const testimonials = await getTestimonials();
   return (
     <section className="bg-gradient-to-br from-muted/50 to-muted/30 py-24 rounded-lg mb-16 relative overflow-hidden">
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
       <div className="container mx-auto px-4 relative z-10">
         <h2 className="text-4xl font-bold text-center bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">
-          What our users say
+          {t("title")}
         </h2>
         <p className="text-center text-muted-foreground text-sm sm:text-base font-semibold mb-12 max-w-2xl mx-auto">
-          Discover how 1MIN2MEET has transformed meeting planning for
-          professionals across industries
+          {t("description")}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {testimonials.map((testimonial, index) => (

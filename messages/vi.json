@@ -1,0 +1,142 @@
+{
+  "metadata": {
+    "title": "1MIN2MEET",
+    "description": "Lên kế hoạch gặp mặt nhanh chóng chỉ trong 1 phút...hoặc hơn"
+  },
+  "common": {
+    "switchLanguage": "Đổi ngôn ngữ"
+  },
+  "Navbar": {
+    "ThemeToggle": {
+      "text": "Thay đổi chủ đề",
+      "items": {
+        "light": "Sáng",
+        "dark": "Tối",
+        "system": "Hệ thống"
+      }
+    },
+    "LoginButton": {
+      "text": "Đăng nhập",
+      "LoginDialogContent": {
+        "title": "Đăng nhập",
+        "description": "Tiến hành đăng nhập để sử dụng ứng dụng",
+        "GuestLoginForm": {
+          "fields": {
+            "name": {
+              "label": "Tên",
+              "placeholder": "Nhập tên của bạn"
+            }
+          },
+          "submit": {
+            "text": {
+              "loading": "Đang đăng nhập...",
+              "normal": "Tiếp tục với vai trò khách"
+            }
+          }
+        },
+        "or": "Hoặc",
+        "continueWithGoogle": "Tiếp tục với Google"
+      }
+    },
+    "MeetingCUDialog": {
+      "button": {
+        "text": {
+          "create": "Tạo lịch hẹn",
+          "edit": "Chỉnh sửa lịch hẹn"
+        }
+      }
+    }
+  },
+  "Footer": {
+    "copyright": "2024 Phát triển bởi Foggo.",
+    "contactWithMe": "Liên hệ với tôi",
+    "ContactForm": {
+      "button": {
+        "text": "Xác nhận"
+      },
+      "form": {
+        "placeholder": "Nhập email của bạn..."
+      }
+    }
+  },
+  "Landing": {
+    "Hero": {
+      "title": "Lên kế hoạch gặp mặt chỉ trong 1 phút",
+      "subtitle": "Hoặc hơn... :)",
+      "description": "Mệt mỏi với các cách lên kế hoạch truyền thống? Trải nghiệm cách tổ chức kế hoạch nhanh chóng với 1MIN2MEET. ",
+      "GetStarted": {
+        "button": {
+          "text": "Bắt đầu trải nghiệm"
+        }
+      }
+    },
+    "Features": {
+      "title": "Các tính năng chính",
+      "description": "Khám phá cách 1MIN2MEET thay đổi trải nghiệm lập kế hoạch gặp mặt của bạn với những tính năng dưới đây.",
+      "features": {
+        "feature1": {
+          "title": "Khởi tạo lịch hẹn dễ dàng",
+          "description": "Khởi tạo lịch hẹn trực tiếp hoặc trực tuyến với đầy đủ các thông tin đi kèm."
+        },
+        "feature2": {
+          "title": "Chia sẻ nhanh",
+          "description": "Chia sẻ lịch hẹn đơn giản bằng cách gửi URL hoặc QR tới người tham gia để họ điền thời gian rảnh."
+        },
+        "feature3": {
+          "title": "Xem thời gian rảnh chung",
+          "description": "Dễ dàng quan sát thời gian tất cả mọi người đều có thể tham gia."
+        },
+        "feature4": {
+          "title": "Quản lí lịch hẹn",
+          "description": "Theo dõi các lịch hẹn đã tạo dễ dàng thông qua dashboard."
+        },
+        "feature5": {
+          "title": "Login đa dạng",
+          "description": "Đăng nhập với Google hay khách đều được. Không có những câu hỏi phiền phức."
+        },
+        "feature6": {
+          "title": "Nhúng dịch vụ Google",
+          "description": "Kết hợp với Google Calendar và People để gia tăng trải nghiệm người dùng."
+        }
+      }
+    },
+    "HowItWorks": {
+      "title": "Cách sử dụng",
+      "description": "Làm theo các bước dưới đây để lên kế hoạch gặp mặt hiệu quả với 1MIN2MEET",
+      "steps": {
+        "step1": {
+          "title": "Tạo một lịch hẹn",
+          "description": "Khởi tạo lịch hẹn của bạn với các thông tin cần thiết"
+        },
+        "step2": {
+          "title": "Chia sẻ với người tham gia",
+          "description": "Mời người khác thông qua URL hoặc QR để họ điền các khoảng thời gian rảnh của họ vào trong bảng"
+        },
+        "step3": {
+          "title": "Tìm thời gian chung hợp lí nhất",
+          "description": "Quan sát xem đâu là khoảng thời gian mà tất cả đều có thể gặp mặt."
+        },
+        "step4": {
+          "title": "Xác nhận và thông báo",
+          "description": "Xác nhận thời gian buổi hẹn và thông báo cho tất cả mọi người."
+        }
+      }
+    },
+    "Testimonials": {
+      "title": "Người dùng của chúng tôi nói gì?",
+      "description": "Khám phá những thứ mà 1MIN2MEET đã thay đổi trong cách các doanh nghiệp khác nhau lên kế hoạch gặp mặt",
+      "testimonials": {
+        "quote1": {
+          "quote": "1MIN2MEET đã thay đổi hoàn toàn cách chúng tôi lên kế hoạch gặp mặt. Nó rất nhanh và hiệu quả!",
+          "author": "Post MaLong",
+          "role": "Frontend developer tại Facebook"
+        },
+        "quote2": {
+          "quote": "Việc tích hợp Google Calendar thực sự là một điểm nhấn. Tôi không cần phải lo lắng về việc quên lịch hẹn nữa.",
+          "author": "Isaac Leviethanh",
+          "role": "Unity developer tại Kuro games"
+        }
+      }
+    }
+  }
+}

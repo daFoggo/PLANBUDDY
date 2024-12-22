@@ -1,4 +1,5 @@
 "use client";
+import { LanguageToggle } from "@/components/common/LanguageToggle";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import LoginButton from "@/components/features/Auth/LoginButton";
 import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
@@ -22,6 +23,7 @@ const NavBar = () => {
       <MobileNav items={navItems} />
       <div className="flex flex-1 items-center justify-end space-x-4">
         {session ? <MeetingCUDialog manageType="create" isOwner={true} /> : null}
+        <LanguageToggle />
         <ThemeToggle />
         <LoginButton status={status} session={session} />
       </div>

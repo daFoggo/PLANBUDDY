@@ -1,0 +1,152 @@
+{
+  "metadata": {
+    "title": "1MIN2MEET",
+    "description": "Schedule meeting quickly in just 1 minute...or more"
+  },
+  "common": {
+    "switchLanguage": "Switch language"
+  },
+  "Navbar": {
+    "ThemeToggle": {
+      "text": "Toggle theme",
+      "items": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
+    },
+    "LoginButton": {
+      "text": "Login",
+      "LoginDialogContent": {
+        "title": "Login",
+        "description": "Start login to use our application",
+        "GuestLoginForm": {
+          "fields": {
+            "name": {
+              "label": "Name",
+              "placeholder": "Enter your name"
+            }
+          },
+          "submit": {
+            "text": {
+              "loading": "Signing in...",
+              "normal": "Continue as Guest"
+            }
+          }
+        },
+        "or": "OR",
+        "continueWithGoogle": "Continue with Google"
+      }
+    },
+    "MeetingCUDialog": {
+      "button": {
+        "text": {
+          "create": "Create meeting",
+          "edit": "Edit meeting"
+        }
+      },
+      "dialog": {
+        "title": {
+          "create": "Create Meeting",
+          "edit": "Edit meeting"
+        },
+        "description": {
+          "create": "Schedule new meeting in just one minute!.",
+          "edit": "Edit your meeting details"
+        }
+      }
+    }
+  },
+  "Footer": {
+    "copyright": "2024 Developed by Foggo. All rights reserved.",
+    "contactWithMe": "Contact with me",
+    "ContactForm": {
+      "button": {
+        "text": "Submit"
+      },
+      "form": {
+        "placeholder": "Enter your email..."
+      }
+    }
+  },
+  "Landing": {
+    "Hero": {
+      "title": "Plan Meetings in Just 1 Minute",
+      "subtitle": "Or more... :)",
+      "description": "Tired of traditional meeting planning? Schedule quickly and efficiently with 1MIN2MEET. ",
+      "GetStarted": {
+        "button": {
+          "text": "Get Started"
+        }
+      }
+    },
+    "Features": {
+      "title": "Key Features",
+      "description": "Discover how 1MIN2MEET revolutionizes your meeting planning experience with these powerful features.",
+      "features": {
+        "feature1": {
+          "title": "Easy Meeting Setup",
+          "description": "Set up in-person or online meetings with all necessary details."
+        },
+        "feature2": {
+          "title": "Quick Sharing",
+          "description": "Simply share the meeting by URL or QR so they can fill in their available times."
+        },
+        "feature3": {
+          "title": "View Common Free Time",
+          "description": "Easily see when everyone is available to make decision."
+        },
+        "feature4": {
+          "title": "Manage Appointments",
+          "description": "Keep track of all your scheduled meetings effortlessly."
+        },
+        "feature5": {
+          "title": "Flexible Login",
+          "description": "Sign in with Google or as a guest. No stupid asking questions."
+        },
+        "feature6": {
+          "title": "Google Integration",
+          "description": "Sync with Google Calendar and People for enhanced user experience."
+        }
+      }
+    },
+    "HowItWorks": {
+      "title": "How It Works",
+      "description": "Follow these simple steps to plan your meetings efficiently with 1MIN2MEET",
+      "steps": {
+        "step1": {
+          "title": "Create A Meeting",
+          "description": "Set up your meeting with all necessary details."
+        },
+        "step2": {
+          "title": "Share With Participants",
+          "description": "Invite others to fill in their available times by URL or QR."
+        },
+        "step3": {
+          "title": "Find Common Time",
+          "description": "Easily view when everyone is available."
+        },
+        "step4": {
+          "title": "Schedule and Notify",
+          "description": "Confirm the meeting time and notify all participants."
+        }
+      }
+    },
+    "Testimonials": {
+      "title": "What our users say",
+      "description": "Discover how 1MIN2MEET has transformed meeting planning for professionals across industries",
+      "testimonials": {
+        "quote1": {
+          "quote": "1MIN2MEET has revolutionized how we schedule team meetings. It's so quick and efficient!",
+          "author": "Post MaLong",
+          "role": "Frontend developer at Facebook"
+        },
+        "quote2": {
+          "quote": "The ease of use and Google Calendar integration make this tool indispensable for our organization.",
+          "author": "Isaac Leviethanh",
+          "role": "Unity developer at Kuro games"
+        }
+      }
+    }
+  }
+}

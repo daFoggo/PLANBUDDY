@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import LoginDialogContent from "@/components/features/Auth/LoginDialogContent";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -6,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 const GetStarted = () => {
+  const t = useTranslations('Landing.Hero.GetStarted.button');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   return (
     <div>
@@ -15,7 +17,7 @@ const GetStarted = () => {
           console.log("Get Started button clicked");
         }}
       >
-        Get Started
+        {t("text")}
         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
       </Button>
 

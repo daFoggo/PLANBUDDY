@@ -9,79 +9,83 @@ import {
   SquarePen,
   TableCellsMerge,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { FaGoogle } from "react-icons/fa";
 
-export const features = [
-  {
-    icon: Calendar,
-    title: "Easy Meeting Setup",
-    description:
-      "Set up in-person or online meetings with all necessary details.",
-  },
-  {
-    icon: Share2,
-    title: "Quick Sharing",
-    description:
-      "Simply share the meeting by URL or QR so they can fill in their available times.",
-  },
-  {
-    icon: TableCellsMerge,
-    title: "View Common Free Time",
-    description: "Easily see when everyone is available to make decision.",
-  },
-  {
-    icon: LayoutList,
-    title: "Manage Appointments",
-    description: "Keep track of all your scheduled meetings effortlessly.",
-  },
-  {
-    icon: LogIn,
-    title: "Flexible Login",
-    description:
-      "Sign in with Google or as a guest. No stupid asking questions.",
-  },
-  {
-    icon: FaGoogle,
-    title: "Google Integration",
-    description:
-      "Sync with Google Calendar and People for enhanced user experience.",
-  },
-];
+export const getFeatures = async () => {
+  const t = await getTranslations("Landing.Features.features");
+  return [
+    {
+      icon: Calendar,
+      title: t("feature1.title"),
+      description: t("feature1.description"),
+    },
+    {
+      icon: Share2,
+      title: t("feature2.title"),
+      description: t("feature2.description"),
+    },
+    {
+      icon: TableCellsMerge,
+      title: t("feature3.title"),
+      description: t("feature3.description"),
+    },
+    {
+      icon: LayoutList,
+      title: t("feature4.title"),
+      description: t("feature4.description"),
+    },
+    {
+      icon: LogIn,
+      title: t("feature5.title"),
+      description: t("feature5.description"),
+    },
+    {
+      icon: FaGoogle,
+      title: t("feature6.title"),
+      description: t("feature6.description"),
+    },
+  ];
+};
 
-export const steps = [
-  {
-    title: "Create A Meeting",
-    icon: SquarePen ,
-    description: "Set up your meeting with all necessary details.",
-  },
-  {
-    title: "Share With Participants",
-    icon: Link,
-    description: "Invite others to fill in their available times by URL or QR.",
-  },
-  {
-    title: "Find Common Time",
-    icon: Combine,
-    description: "Easily view when everyone is available.",
-  },
-  {
-    title: "Schedule and Notify",
-    icon: BellRing,
-    description: "Confirm the meeting time and notify all participants.",
-  },
-];
+export const getSteps = async () => {
+  const t = await getTranslations("Landing.HowItWorks.steps");
+  return [
+    {
+      icon: SquarePen,
+      title: t("step1.title"),
+      description: t("step1.description"),
+    },
+    {
+      icon: Link,
+      title: t("step2.title"),
+      description: t("step2.description"),
+    },
+    {
+      icon: Combine,
+      title: t("step3.title"),
+      description: t("step3.description"),
+    },
+    {
+      icon: BellRing,
+      title: t("step4.title"),
+      description: t("step4.description"),
+    },
+  ];
+};
 
-export const testimonials = [
-  {
-    quote:
-      "1MIN2MEET has revolutionized how we schedule team meetings. It's so quick and efficient!",
-    author: "Post MaLong",
-    role: "Frontend developer at Facebook",
-  },
-  {
-    quote:
-      "The ease of use and Google Calendar integration make this tool indispensable for our organization.",
-    author: "Isaac Leviethanh",
-    role: "Unity developer at Kuro games",
-  },
-];
+export const getTestimonials = async () => {
+  const t = await getTranslations("Landing.Testimonials.testimonials");
+  return [
+    {
+      quote: t("quote1.quote"),
+      author: t("quote1.author"),
+      role: t("quote1.role"),
+    },
+    {
+      quote: t("quote2.quote"),
+      author: t("quote2.author"),
+      role: t("quote2.role"),
+    },
+  ];
+};

@@ -18,12 +18,16 @@ import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
 import { IGuestLoginFormProps } from "@/types/guest-login-form";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { formSchema } from "./constant";
 
 type FormValues = z.infer<typeof formSchema>;
 
 const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
+  const t = useTranslations(
+    "Navbar.LoginButton.LoginDialogContent.GuestLoginForm"
+  );
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -73,11 +77,11 @@ const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>{t("fields.name.label")}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="Enter your name"
+                  placeholder={t("fields.name.placeholder")}
                   disabled={isLoading}
                   autoComplete="name"
                 />
@@ -97,10 +101,10 @@ const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
           {isLoading ? (
             <>
               <Loader2 className="size-4 animate-spin" />
-              Signing in...
+              {t("submit.text.loading")}
             </>
           ) : (
-            "Continue as Guest"
+            t("submit.text.normal")
           )}
         </Button>
       </form>

@@ -11,8 +11,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 const ContactForm = () => {
+  const t = useTranslations("Footer.ContactForm");
   const form = useForm({
     defaultValues: {
       email: "",
@@ -36,7 +38,7 @@ const ContactForm = () => {
             <FormItem className="flex-1">
               <FormControl>
                 <Input
-                  placeholder="Enter your email..."
+                  placeholder={t("form.placeholder")}
                   {...field}
                   className="w-full"
                 />
@@ -47,7 +49,7 @@ const ContactForm = () => {
         />
         <Button type="submit" size="sm" className="w-full sm:w-auto">
           <Send className="size-4" />
-          Submit
+          {t("button.text")}
         </Button>
       </form>
     </Form>

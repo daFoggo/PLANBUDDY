@@ -9,18 +9,21 @@ import {
 import { signIn } from "next-auth/react";
 import { FaGoogle } from "react-icons/fa";
 import GuestLoginForm from "./GuestLoginForm";
+import { useTranslations } from "next-intl";
 
 const LoginDialogContent = ({
   setIsDialogOpen,
 }: {
   setIsDialogOpen: (state: boolean) => void;
 }) => {
+  const t = useTranslations("Navbar.LoginButton.LoginDialogContent");
+
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-xl">Login</DialogTitle>
+        <DialogTitle className="text-xl">{t("title")}</DialogTitle>
         <DialogDescription>
-          Start login to use our application
+          {t("description")}
         </DialogDescription>
       </DialogHeader>
       <div className="flex flex-col gap-4">
@@ -30,7 +33,7 @@ const LoginDialogContent = ({
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-sm font-semibold">
-            <span className="bg-background px-2 text-muted-foreground">OR</span>
+            <span className="bg-background px-2 text-muted-foreground">{t("or")}</span>
           </div>
         </div>
 
@@ -40,7 +43,7 @@ const LoginDialogContent = ({
           variant="outline"
         >
           <FaGoogle className="size-4" />
-          Continue with Google
+          {t("continueWithGoogle")}
         </Button>
       </div>
     </>

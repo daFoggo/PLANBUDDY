@@ -287,7 +287,12 @@ export async function deleteParticipant(
 export async function updateAvailability(
   meetingId: string,
   userId: string,
-  slots[],
+  slots: { 
+    date: string | Date;
+    startTime: string;
+    endTime: string;
+    status: string;
+  }[],
   timeZone: string
 ) {
   return prisma.$transaction(async (tx) => {

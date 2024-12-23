@@ -97,12 +97,12 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   }, [meetingData, form]);
 
   //debug form
-  useEffect(() => {
-    if (form.formState.errors) {
-      console.log(form.formState.errors);
-      console.log(meetingData);
-    }
-  }, [form.formState.errors]);
+  // useEffect(() => {
+  //   if (form.formState.errors) {
+  //     console.log(form.formState.errors);
+  //     console.log(meetingData);
+  //   }
+  // }, [form.formState.errors]);
 
   const handleDateTypeChange = (dateType: string) => {
     if (dateType === DATE_TYPE.WEEKLY) {

@@ -1,5 +1,6 @@
 import { PARTICIPANT_ROLE } from "@/components/utils/constant";
 import { prisma } from "./prisma";
+import { IMeeting } from "@/types/dashboard";
 
 export async function getMeetingById(meetingId: string) {
   return prisma.meeting.findUnique({
@@ -123,7 +124,7 @@ export async function getUserMeetings(userId: string) {
   };
 }
 
-export async function createMeeting(meetingData, userId: string) {
+export async function createMeeting(meetingData: IMeeting, userId: string) {
   return prisma.meeting.create({
     data: {
       title: meetingData.title,
@@ -133,7 +134,7 @@ export async function createMeeting(meetingData, userId: string) {
       note: meetingData.note || null,
       dateType: meetingData.dateType,
       proposedDates: meetingData.proposedDates.map(
-        (date: string) => new Date(date)
+        (date: Date) => new Date(date)
       ),
       startTime: meetingData.startTime,
       endTime: meetingData.endTime,
@@ -145,9 +146,12 @@ export async function createMeeting(meetingData, userId: string) {
             role: "OWNER",
           },
           ...(meetingData.participants || [])
-            .filter((participant) => participant.userId !== userId)
+            .filter(
+              (participant) =>
+                participant.userId && participant.userId !== userId
+            )
             .map((participant) => ({
-              userId: participant.userId,
+              userId: participant.userId!,
               role: participant.role || "PARTICIPANT",
             })),
         ],
@@ -169,7 +173,7 @@ export async function createMeeting(meetingData, userId: string) {
   });
 }
 
-export async function updateMeeting(meetingData, userId: string) {
+export async function updateMeeting(meetingData: IMeeting, userId: string) {
   const updateData = {
     ...(meetingData.title && { title: meetingData.title }),
     ...(meetingData.description !== undefined && {
@@ -183,7 +187,7 @@ export async function updateMeeting(meetingData, userId: string) {
     ...(meetingData.dateType && { dateType: meetingData.dateType }),
     ...(meetingData.proposedDates && {
       proposedDates: meetingData.proposedDates.map(
-        (date: string) => new Date(date)
+        (date: Date) => new Date(date)
       ),
     }),
     ...(meetingData.startTime && { startTime: meetingData.startTime }),
@@ -209,14 +213,16 @@ export async function updateMeeting(meetingData, userId: string) {
       data: [
         {
           userId,
-          meetingId: meetingData.id,
+          meetingId: meetingData.id as string,
           role: PARTICIPANT_ROLE.OWNER,
         },
         ...(meetingData.participants || [])
-          .filter((participant) => participant.userId !== userId)
+          .filter(
+            (participant) => participant.userId && participant.userId !== userId
+          )
           .map((participant) => ({
-            userId: participant.userId,
-            meetingId: meetingData.id,
+            userId: participant.userId!,
+            meetingId: meetingData.id as string,
             role: participant.role || PARTICIPANT_ROLE.PARTICIPANT,
           })),
       ],
@@ -230,7 +236,7 @@ export async function updateMeeting(meetingData, userId: string) {
 
     await prisma.availableSlot.createMany({
       data: meetingData.availableSlots.map((slot) => ({
-        meetingId: meetingData.id,
+        meetingId: meetingData.id as string,
         userId,
         date: new Date(slot.date),
         startTime: slot.startTime,
@@ -287,7 +293,7 @@ export async function deleteParticipant(
 export async function updateAvailability(
   meetingId: string,
   userId: string,
-  slots: { 
+  slots: {
     date: string | Date;
     startTime: string;
     endTime: string;
@@ -321,9 +327,10 @@ export async function updateAvailability(
     });
 
     await tx.availableSlot.createMany({
+      //  @ts-expect-error userId is not null
       data: slots.map((slot) => ({
-        userId,
-        meetingId,
+        userId: userId as string,
+        meetingId: meetingId as string,
         date: new Date(slot.date),
         startTime: slot.startTime,
         endTime: slot.endTime,

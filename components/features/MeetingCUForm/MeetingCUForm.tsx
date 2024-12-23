@@ -129,7 +129,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
         : {
             ...values,
             availableSlots:
-            //@ts-expect-error
+            //@ts-expect-error meetingData.availableSlots might be undefined but is handled in the fallback
               meetingData?.availableSlots ||
               values.proposedDates.map((date) => ({
                 date: normalizeDate(date),

@@ -259,6 +259,8 @@ const AvailabilityGrid = ({
     meeting.availableSlots,
     session?.user?.id,
     meeting.proposedDates,
+    commonSlotStatuses,
+    timeSlots
   ]);
 
   useEffect(() => {

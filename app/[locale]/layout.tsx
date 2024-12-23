@@ -54,11 +54,11 @@ export default function RootLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  if (!locales.includes(locale as any)) {
-    return null
+  if (!locales.includes(locale as 'en' | 'vi')) {
+    notFound()
   }
   setRequestLocale(locale)
-  
+
   const messages = useMessages();
   if (!messages) notFound();
 

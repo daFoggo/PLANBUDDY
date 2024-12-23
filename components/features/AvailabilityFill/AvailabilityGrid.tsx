@@ -36,7 +36,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { ITimeSlot } from "@/types/availability-fill";
-import { IMeeting } from "@/types/dashboard";
+import { IAvailableSlot, IMeeting } from "@/types/dashboard";
 import { format } from "date-fns";
 import {
   Loader2,
@@ -92,16 +92,16 @@ const AvailabilityGrid = ({
 
   // Common slot from all users
   const commonSlotStatuses = useCallback(
-    (slots: ITimeSlot[], availableSlots): ITimeSlot[] => {
+    (slots: ITimeSlot[], availableSlots: IAvailableSlot[]): ITimeSlot[] => {
       const commonSlots = [...slots];
 
-      const totalUsers = new Set(availableSlots.map((slot) => slot.userId))
+      const totalUsers = new Set(availableSlots.map((slot: { userId: any; }) => slot.userId))
         .size;
 
       commonSlots.forEach((slot) => {
         slot.status = slot.status.map((_, dateIndex) => {
           const positiveAvailableUserCount = availableSlots.filter(
-            (s) =>
+            (s: { startTime: string; date: string | number | Date; status: string; }) =>
               s.startTime === slot.time &&
               format(new Date(s.date), "yyyy-MM-dd") ===
                 format(

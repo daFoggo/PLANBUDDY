@@ -28,7 +28,12 @@ export const formSchema = z.object({
       timeZone: z.string().optional(),
     })
   ).min(1, { message: "At least one participant is required" }),
-  availableSlots: z.array(z.object({})).optional(),
+  availableSlots: z.array(z.object({
+    date: z.date(),
+    startTime: z.string(),
+    endTime: z.string(),
+    timeZone: z.string()
+  })),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
   isAllDay: z.boolean().optional().default(false),

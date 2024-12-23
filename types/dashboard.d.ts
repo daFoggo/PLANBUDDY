@@ -9,6 +9,7 @@ import {
 } from "@/components/utils/constant";
 
 export interface IMeeting {
+  isLocked: any;
   id?: string;
   title: string;
   description: string?;

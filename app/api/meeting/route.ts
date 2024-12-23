@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../auth/[...nextauth]/route";
+import { auth } from "@/auth";
 import { PARTICIPANT_ROLE } from "@/components/utils/constant";
 import {
   getMeetingById,

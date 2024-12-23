@@ -1,10 +1,10 @@
-import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
-import Google from "next-auth/providers/google";
-import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
+import NextAuth from "next-auth"
+import { prisma } from "@/lib/prisma"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
+import { v4 as uuidv4 } from "uuid"
+import { z } from "zod"
 
 const guestSchema = z.object({
   name: z
@@ -13,26 +13,11 @@ const guestSchema = z.object({
     .max(50, "Name must not exceed 50 characters")
     .regex(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
   userType: z.literal("GUEST"),
-});
+})
 
-const customAdapter = {
-  ...PrismaAdapter(prisma),
-  createUser: async (user) => {
-    const data = {
-      ...user,
-      email: user.email || `${uuidv4()}@guest.local`,
-      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
-      userType: "GOOGLE_USER",
-    };
-
-    const newUser = await prisma.user.create({ data });
-    return newUser;
-  },
-};
-
-export const authOptions = {
-  adapter: customAdapter,
-  session: { strategy: "jwt" },
+const config = {
+  adapter: PrismaAdapter(prisma),
+  session: { strategy: "jwt" as const },
   pages: {
     signIn: "/login",
   },
@@ -43,19 +28,16 @@ export const authOptions = {
     }),
     Credentials({
       id: "credentials",
-      name: "Credentials",
+      name: "Credentials", 
       credentials: {
         name: { label: "Name", type: "text" },
         userType: { label: "User Type", type: "text" },
       },
       async authorize(credentials) {
-        const parsedCredentials = guestSchema.safeParse(credentials);
+        const parsedCredentials = guestSchema.safeParse(credentials)
+        if (!parsedCredentials.success) return null
 
-        if (!parsedCredentials.success) {
-          return null;
-        }
-
-        const { name } = parsedCredentials.data;
+        const { name } = parsedCredentials.data
         const user = await prisma.user.create({
           data: {
             name,
@@ -64,42 +46,34 @@ export const authOptions = {
             email: `${uuidv4()}@guest.local`,
             emailVerified: null,
           },
-        });
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-          emailVerified: user.emailVerified,
-          userType: user.userType,
-          timeZone: user.timeZone,
-        };
+        })
+        return user
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user, account }) {
       if (user && account) {
-        token.userType = account.provider === "google" ? "GOOGLE_USER" : "GUEST";
-        token.id = user.id;
+        token.userType = account.provider === "google" ? "GOOGLE_USER" : "GUEST"
+        token.id = user.id
       }
-      return token;
+      return token
     },
     async session({ session, token }) {
       if (token) {
         const user = await prisma.user.findUnique({
           where: { email: session.user.email! },
           select: { id: true, timeZone: true },
-        });
-
+        })
         if (user) {
-          session.user.id = user.id;
-          session.user.timeZone = user.timeZone;
+          session.user.id = user.id
+          session.user.timeZone = user.timeZone
         }
-        session.user.userType = token.userType as "GOOGLE_USER" | "GUEST";
+        session.user.userType = token.userType as "GOOGLE_USER" | "GUEST"
       }
-      return session;
+      return session
     },
   },
-};
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth(config)

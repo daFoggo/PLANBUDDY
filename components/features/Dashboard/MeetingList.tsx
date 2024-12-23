@@ -147,9 +147,9 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
               <Button
                 variant="outline"
                 className="w-full sm:w-auto text-xs sm:text-sm"
-                rightIcon={<ArrowUpRight className="size-3 sm:size-4" />}
               >
                 View Details
+                <ArrowUpRight className="size-3 sm:size-4" />
               </Button>
             </Link>
           </div>

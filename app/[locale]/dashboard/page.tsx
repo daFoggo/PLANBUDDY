@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { auth } from "@/app/api/auth/[...nextauth]/route";
+import { auth } from "@/auth";
 
 import MeetingList from "@/components/features/Dashboard/MeetingList";
 import Overview from "@/components/features/Dashboard/Overview";

@@ -61,8 +61,8 @@ const MeetingQRGen = ({ meetingId }: { meetingId: string }) => {
           <Button
             className=""
             onClick={handleDownloadQR}
-            leftIcon={<Download className="size-4" />}
           >
+            <Download className="size-4" />
             Download QR Code
           </Button>
         </div>

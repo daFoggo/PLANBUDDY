@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import PageTitle from "@/components/common/PageTitle";
+import AvailabilityChoose from "@/components/features/AvailabilityFill/AvailabilityChoose";
 import AvailabilityGrid from "@/components/features/AvailabilityFill/AvailabilityGrid";
 import MeetingCopy from "@/components/features/MeetingCUForm/MeetingCopy";
 import MeetingCUDialog from "@/components/features/MeetingCUForm/MeetingCUDialog";
@@ -21,7 +22,14 @@ import {
   getStatusColor,
 } from "@/components/utils/helper/meeting-list";
 import { IMeeting } from "@/types/dashboard";
-import { Calendar, CalendarSearch, Clock, MapPin, MessageCircleWarning, Users } from 'lucide-react';
+import {
+  Calendar,
+  CalendarSearch,
+  Clock,
+  MapPin,
+  MessageCircleWarning,
+  Users,
+} from "lucide-react";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { SiGooglemeet } from "react-icons/si";
@@ -108,21 +116,30 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
                   </div>
                 </div>
 
-                <Separator orientation="vertical" className="h-4 hidden sm:block" />
+                <Separator
+                  orientation="vertical"
+                  className="h-4 hidden sm:block"
+                />
 
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground font-semibold">
                   <Calendar className="size-4 text-foreground flex-shrink-0" />
                   <span>{date}</span>
                 </div>
 
-                <Separator orientation="vertical" className="h-4 hidden sm:block" />
+                <Separator
+                  orientation="vertical"
+                  className="h-4 hidden sm:block"
+                />
 
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground font-semibold">
                   <Clock className="size-4 text-foreground flex-shrink-0" />
                   <span>{time}</span>
                 </div>
 
-                <Separator orientation="vertical" className="h-4 hidden sm:block" />
+                <Separator
+                  orientation="vertical"
+                  className="h-4 hidden sm:block"
+                />
 
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground font-semibold">
                   {meeting.meetingType === MEETING_TYPE.INPERSON ? (
@@ -161,7 +178,7 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <AvailabilityGrid meeting={meeting} isOwner={isOwner} />
-          {/* <AvailabilityChoose meeting={meeting} isOwner={isOwner} /> */}
+          <AvailabilityChoose meeting={meeting} isOwner={isOwner} />
         </div>
       </div>
     );
@@ -172,4 +189,3 @@ const MeetingDetail = async ({ params }: { params: { meetingId: string } }) => {
 };
 
 export default MeetingDetail;
-

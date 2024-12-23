@@ -67,7 +67,9 @@ const AvailabilityChoose = ({ meeting, isOwner }: AvailabilityChooseProps) => {
           <div className="flex justify-end gap-2">
             <Button
               variant={meeting.isLocked ? "default" : "secondary"}
-              onClick={meeting.isLocked ? handleUnlockMeeting : handleLockMeeting}
+              onClick={
+                meeting.isLocked ? handleUnlockMeeting : handleLockMeeting
+              }
               disabled={isLoading}
             >
               {isLoading

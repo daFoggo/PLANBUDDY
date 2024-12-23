@@ -10,6 +10,7 @@ import "../globals.css";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { notFound } from "next/navigation";
 import { locales } from "@/i18n.config";
+import { setRequestLocale } from "next-intl/server";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -53,8 +54,12 @@ export default function RootLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
+  if (!locales.includes(locale as any)) {
+    return null
+  }
+  setRequestLocale(locale)
+  
   const messages = useMessages();
-
   if (!messages) notFound();
 
   return (

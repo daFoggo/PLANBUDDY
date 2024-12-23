@@ -33,7 +33,7 @@ export const formSchema = z.object({
     startTime: z.string(),
     endTime: z.string(),
     timeZone: z.string()
-  })),
+  })).optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
   isAllDay: z.boolean().optional().default(false),

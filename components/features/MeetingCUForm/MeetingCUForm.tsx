@@ -129,7 +129,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
         : {
             ...values,
             availableSlots:
-            // @ts-ignore
+            //@ts-expect-error
               meetingData?.availableSlots ||
               values.proposedDates.map((date) => ({
                 date: normalizeDate(date),

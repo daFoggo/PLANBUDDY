@@ -75,6 +75,7 @@ const config: Config = {
       "fade-in-down": "fadeInDown 0.5s ease-out",
       "fade-in-up": "fadeInUp 0.5s ease-out",
       gradient: "gradient 3s ease infinite",
+      spin: 'spin 1s linear infinite',
     },
     keyframes: {
       fadeInDown: {
@@ -104,6 +105,10 @@ const config: Config = {
           transform: 'translateY(0)',
           animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
         },
+      },
+      spin: {
+        from: { transform: 'rotate(0deg)' },
+        to: { transform: 'rotate(360deg)' },
       },
     },
   },

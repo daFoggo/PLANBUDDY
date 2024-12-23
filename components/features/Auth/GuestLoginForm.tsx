@@ -62,7 +62,9 @@ const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
     } catch (error) {
       form.setError("root", {
         type: "manual",
-        message: `An unexpected error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`
+        message: `An unexpected error occurred: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
       });
     } finally {
       setIsLoading(false);

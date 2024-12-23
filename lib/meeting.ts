@@ -111,9 +111,9 @@ export async function getUserMeetings(userId: string) {
       },
     }),
     arrangingMeeting:
-      stats.find((stat: any) => stat.status === "PUBLISHED")?._count?.id || 0,
+      stats.find((stat) => stat.status === "PUBLISHED")?._count?.id || 0,
     scheduledMeeting:
-      stats.find((stat: any) => stat.status === "SCHEDULED")?._count?.id || 0,
+      stats.find((stat) => stat.status === "SCHEDULED")?._count?.id || 0,
   };
 
   return {
@@ -123,7 +123,7 @@ export async function getUserMeetings(userId: string) {
   };
 }
 
-export async function createMeeting(meetingData: any, userId: string) {
+export async function createMeeting(meetingData, userId: string) {
   return prisma.meeting.create({
     data: {
       title: meetingData.title,
@@ -145,15 +145,15 @@ export async function createMeeting(meetingData: any, userId: string) {
             role: "OWNER",
           },
           ...(meetingData.participants || [])
-            .filter((participant: any) => participant.userId !== userId)
-            .map((participant: any) => ({
+            .filter((participant) => participant.userId !== userId)
+            .map((participant) => ({
               userId: participant.userId,
               role: participant.role || "PARTICIPANT",
             })),
         ],
       },
       availableSlots: {
-        create: meetingData.availableSlots.map((slot: any) => ({
+        create: meetingData.availableSlots.map((slot) => ({
           userId,
           date: new Date(slot.date),
           startTime: slot.startTime,
@@ -169,8 +169,8 @@ export async function createMeeting(meetingData: any, userId: string) {
   });
 }
 
-export async function updateMeeting(meetingData: any, userId: string) {
-  const updateData: any = {
+export async function updateMeeting(meetingData, userId: string) {
+  const updateData = {
     ...(meetingData.title && { title: meetingData.title }),
     ...(meetingData.description !== undefined && {
       description: meetingData.description,
@@ -213,8 +213,8 @@ export async function updateMeeting(meetingData: any, userId: string) {
           role: PARTICIPANT_ROLE.OWNER,
         },
         ...(meetingData.participants || [])
-          .filter((participant: any) => participant.userId !== userId)
-          .map((participant: any) => ({
+          .filter((participant) => participant.userId !== userId)
+          .map((participant) => ({
             userId: participant.userId,
             meetingId: meetingData.id,
             role: participant.role || PARTICIPANT_ROLE.PARTICIPANT,
@@ -229,7 +229,7 @@ export async function updateMeeting(meetingData: any, userId: string) {
     });
 
     await prisma.availableSlot.createMany({
-      data: meetingData.availableSlots.map((slot: any) => ({
+      data: meetingData.availableSlots.map((slot) => ({
         meetingId: meetingData.id,
         userId,
         date: new Date(slot.date),
@@ -287,7 +287,7 @@ export async function deleteParticipant(
 export async function updateAvailability(
   meetingId: string,
   userId: string,
-  slots: any[],
+  slots[],
   timeZone: string
 ) {
   return prisma.$transaction(async (tx) => {

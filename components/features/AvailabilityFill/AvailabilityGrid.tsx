@@ -1,5 +1,5 @@
 "use client";
-
+import { useCallback } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -91,39 +91,40 @@ const AvailabilityGrid = ({
   }, [meeting.proposedDates]);
 
   // Common slot from all users
-  const commonSlotStatuses = (
-    slots: ITimeSlot[],
-    availableSlots: any[]
-  ): ITimeSlot[] => {
-    const commonSlots = [...slots];
+  const commonSlotStatuses = useCallback(
+    (slots: ITimeSlot[], availableSlots: any[]): ITimeSlot[] => {
+      const commonSlots = [...slots];
 
-    const totalUsers = new Set(availableSlots.map((slot) => slot.userId)).size;
+      const totalUsers = new Set(availableSlots.map((slot) => slot.userId))
+        .size;
 
-    commonSlots.forEach((slot, slotIndex) => {
-      slot.status = slot.status.map((_, dateIndex) => {
-        const positiveAvailableUserCount = availableSlots.filter(
-          (s) =>
-            s.startTime === slot.time &&
-            format(new Date(s.date), "yyyy-MM-dd") ===
-              format(
-                new Date(meeting.proposedDates[dateIndex]),
-                "yyyy-MM-dd"
-              ) &&
-            (s.status === "AVAILABLE" || s.status === "IFNEEDED")
-        ).length;
+      commonSlots.forEach((slot, slotIndex) => {
+        slot.status = slot.status.map((_, dateIndex) => {
+          const positiveAvailableUserCount = availableSlots.filter(
+            (s) =>
+              s.startTime === slot.time &&
+              format(new Date(s.date), "yyyy-MM-dd") ===
+                format(
+                  new Date(meeting.proposedDates[dateIndex]),
+                  "yyyy-MM-dd"
+                ) &&
+              (s.status === "AVAILABLE" || s.status === "IFNEEDED")
+          ).length;
 
-        if (positiveAvailableUserCount === totalUsers) {
-          return SLOT_STATUS.AVAILABLE; // All users available or if needed
-        } else if (positiveAvailableUserCount > 0) {
-          return SLOT_STATUS.IFNEEDED; // Some users available or if needed
-        } else {
-          return SLOT_STATUS.UNAVAILABLE; // No users available
-        }
+          if (positiveAvailableUserCount === totalUsers) {
+            return SLOT_STATUS.AVAILABLE; // All users available or if needed
+          } else if (positiveAvailableUserCount > 0) {
+            return SLOT_STATUS.IFNEEDED; // Some users available or if needed
+          } else {
+            return SLOT_STATUS.UNAVAILABLE; // No users available
+          }
+        });
       });
-    });
 
-    return commonSlots;
-  };
+      return commonSlots;
+    },
+    [meeting.proposedDates]
+  );
 
   // Render time slot with status
   const timeSlots: ITimeSlot[] = useMemo(() => {
@@ -260,7 +261,7 @@ const AvailabilityGrid = ({
     session?.user?.id,
     meeting.proposedDates,
     commonSlotStatuses,
-    timeSlots
+    timeSlots,
   ]);
 
   useEffect(() => {

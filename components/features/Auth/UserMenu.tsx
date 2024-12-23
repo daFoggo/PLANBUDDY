@@ -1,5 +1,4 @@
 import { signOut } from "next-auth/react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +9,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
-import Link from "next/link";
+import { LogOut, Settings } from "lucide-react";
+import { Session } from "next-auth";
 
-const UserMenu = ({ session }: any) => {
+interface UserMenuProps {
+  session: Session | null;
+}
+
+const UserMenu = ({ session }: UserMenuProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,7 +29,7 @@ const UserMenu = ({ session }: any) => {
             <AvatarFallback>
               {session?.user?.name
                 ?.split(" ")
-                .map((n: any) => n[0])
+                .map((n: string) => n[0])
                 .join("")
                 .toUpperCase() || "U"}
             </AvatarFallback>
@@ -50,9 +53,11 @@ const UserMenu = ({ session }: any) => {
           Settings
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => {
-          signOut({redirectTo: "/"});
-          }}>
+        <DropdownMenuItem
+          onClick={() => {
+            signOut({ callbackUrl: "/" });
+          }}
+        >
           <LogOut className="w-4 h-4 mr-2" />
           Log out
         </DropdownMenuItem>

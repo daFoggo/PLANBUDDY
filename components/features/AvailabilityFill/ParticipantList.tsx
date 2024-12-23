@@ -81,6 +81,7 @@ const Participant = ({
         }
       } catch (error) {
         toast.error("Failed to delete participant");
+        console.error(error); 
       } finally {
         setIsLoading(false);
       }

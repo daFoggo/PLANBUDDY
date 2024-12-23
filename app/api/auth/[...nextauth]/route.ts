@@ -17,7 +17,7 @@ const guestSchema = z.object({
 
 const customAdapter = {
   ...PrismaAdapter(prisma),
-  createUser: async (user: any) => {
+  createUser: async (user) => {
     const data = {
       ...user,
       email: user.email || `${uuidv4()}@guest.local`,

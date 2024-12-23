@@ -1,4 +1,4 @@
 export interface ILoginButtonProps {
-    session: any;
+    session: Session | null;
     status: string;
 }

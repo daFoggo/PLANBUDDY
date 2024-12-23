@@ -92,7 +92,7 @@ const AvailabilityGrid = ({
 
   // Common slot from all users
   const commonSlotStatuses = useCallback(
-    (slots: ITimeSlot[], availableSlots: any[]): ITimeSlot[] => {
+    (slots: ITimeSlot[], availableSlots): ITimeSlot[] => {
       const commonSlots = [...slots];
 
       const totalUsers = new Set(availableSlots.map((slot) => slot.userId))

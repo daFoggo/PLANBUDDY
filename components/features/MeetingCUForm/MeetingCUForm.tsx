@@ -405,7 +405,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
             <FormField
               control={form.control}
               name="isAllDay"
-              render={({}) => (
+              render={() => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox

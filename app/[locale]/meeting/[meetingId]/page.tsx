@@ -1,4 +1,4 @@
-import { auth } from "@/app/api/auth/[...nextauth]/route";
+import { auth } from "@/auth";
 import PageTitle from "@/components/common/PageTitle";
 import AvailabilityChoose from "@/components/features/AvailabilityFill/AvailabilityChoose";
 import AvailabilityGrid from "@/components/features/AvailabilityFill/AvailabilityGrid";

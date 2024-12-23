@@ -98,7 +98,7 @@ const AvailabilityGrid = ({
       const totalUsers = new Set(availableSlots.map((slot) => slot.userId))
         .size;
 
-      commonSlots.forEach((slot, slotIndex) => {
+      commonSlots.forEach((slot) => {
         slot.status = slot.status.map((_, dateIndex) => {
           const positiveAvailableUserCount = availableSlots.filter(
             (s) =>
@@ -133,7 +133,7 @@ const AvailabilityGrid = ({
     const endHour = getHourDecimal(meeting.endTime);
 
     for (let hour = startHour; hour < endHour; hour++) {
-      for (let minute of [0, 30]) {
+      for (const minute of [0, 30]) {
         slots.push({
           time: format(new Date().setHours(hour, minute), "HH:mm"),
           status: meeting.proposedDates.map(() => SLOT_STATUS.UNAVAILABLE),

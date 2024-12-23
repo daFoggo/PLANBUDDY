@@ -122,46 +122,54 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
     setIsLoading(true);
 
     try {
+      const body = meetingData
+        ? {
+            id: meetingData?.id,
+            ...values,
+          }
+        : {
+            ...values,
+            availableSlots:
+              meetingData?.availableSlots ||
+              values.proposedDates.map((date) => ({
+                date: normalizeDate(date),
+                startTime: values.isAllDay ? "00:00" : values.startTime,
+                endTime: values.isAllDay ? "23:30" : values.endTime,
+                timeZone: session.user.timeZone,
+              })),
+            status: MEETING_STATUS.PUBLISHED,
+          };
+
       const response = await fetch("/api/meeting", {
         method: meetingData ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: (meetingData as IMeeting)
-          ? JSON.stringify({
-              id: meetingData?.id,
-              ...values,
-            })
-          : JSON.stringify({
-              ...values,
-              availableSlots:
-                meetingData?.availableSlots ||
-                values.proposedDates.map((date) => ({
-                  date: normalizeDate(date),
-                  startTime: values.isAllDay ? "00:00" : values.startTime,
-                  endTime: values.isAllDay ? "23:30" : values.endTime,
-                  timeZone: session.user.timeZone,
-                })),
-              status: MEETING_STATUS.PUBLISHED,
-            }),
+        body: JSON.stringify(body),
       });
 
       if (response.ok) {
         const data = await response.json();
-        meetingData
-          ? router.refresh()
-          : router.push(`/meeting/${data.meeting.id}`);
+
+        if (meetingData) {
+          router.refresh();
+        } else {
+          router.push(`/meeting/${data.meeting.id}`);
+        }
 
         onClose();
-        meetingData
-          ? toast.success("Meeting updated successfully")
-          : toast.success("Meeting created successfully");
+
+        toast.success(
+          meetingData
+            ? "Meeting updated successfully"
+            : "Meeting created successfully"
+        );
       }
     } catch (error) {
       console.error("Meeting creation failed:", error);
-      meetingData
-        ? toast.error("Error updating meeting")
-        : toast.error("Error creating meeting");
+      toast.error(
+        meetingData ? "Error updating meeting" : "Error creating meeting"
+      );
     } finally {
       setIsLoading(false);
     }

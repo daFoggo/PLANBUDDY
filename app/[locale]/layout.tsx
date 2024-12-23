@@ -22,11 +22,22 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   return {
-    title: locale === "vi" ? "1MIN2MEET - Lên Lịch Họp Nhanh" : "1MIN2MEET",
+    title:
+      locale === "vi"
+        ? "1MIN2MEET - Lên Lịch Họp Nhanh"
+        : "1MIN2MEET - Fast Meeting Scheduler",
     description:
       locale === "vi"
         ? "Lên lịch họp nhanh chóng trong 1 phút"
         : "Fast meeting scheduler in 1 minute",
+    openGraph: {
+      title: "1MIN2MEET",
+      description:
+        locale === "vi"
+          ? "Lên lịch họp nhanh chóng trong 1 phút"
+          : "Fast meeting scheduler in 1 minute",
+      images: "@/favicon.ico",
+    },
   };
 }
 
@@ -54,10 +65,10 @@ export default function RootLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  if (!locales.includes(locale as 'en' | 'vi')) {
-    notFound()
+  if (!locales.includes(locale as "en" | "vi")) {
+    notFound();
   }
-  setRequestLocale(locale)
+  setRequestLocale(locale);
 
   const messages = useMessages();
   if (!messages) notFound();
@@ -68,6 +79,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.className} ${customFont.variable}`}
     >
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
       <body
         className={`min-h-screen bg-background text-foreground antialiased font-inter`}
       >

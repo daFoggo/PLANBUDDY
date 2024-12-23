@@ -95,7 +95,7 @@ const AvailabilityGrid = ({
     (slots: ITimeSlot[], availableSlots: IAvailableSlot[]): ITimeSlot[] => {
       const commonSlots = [...slots];
 
-      const totalUsers = new Set(availableSlots.map((slot: { userId: any; }) => slot.userId))
+      const totalUsers = new Set(availableSlots.map((slot: { userId: string }) => slot.userId))
         .size;
 
       commonSlots.forEach((slot) => {

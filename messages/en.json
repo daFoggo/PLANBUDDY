@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "1MIN2MEET",
+    "title": "SCHEDOU",
     "description": "Schedule meeting quickly in just 1 minute...or more"
   },
   "common": {
@@ -73,7 +73,7 @@
     "Hero": {
       "title": "Plan Meetings in Just 1 Minute",
       "subtitle": "Or more... :)",
-      "description": "Tired of traditional meeting planning? Schedule quickly and efficiently with 1MIN2MEET. ",
+      "description": "Tired of traditional meeting planning? Schedule quickly and efficiently with SCHEDOU. ",
       "GetStarted": {
         "button": {
           "text": "Get Started"
@@ -82,7 +82,7 @@
     },
     "Features": {
       "title": "Key Features",
-      "description": "Discover how 1MIN2MEET revolutionizes your meeting planning experience with these powerful features.",
+      "description": "Discover how SCHEDOU revolutionizes your meeting planning experience with these powerful features.",
       "features": {
         "feature1": {
           "title": "Easy Meeting Setup",
@@ -112,7 +112,7 @@
     },
     "HowItWorks": {
       "title": "How It Works",
-      "description": "Follow these simple steps to plan your meetings efficiently with 1MIN2MEET",
+      "description": "Follow these simple steps to plan your meetings efficiently with SCHEDOU",
       "steps": {
         "step1": {
           "title": "Create A Meeting",
@@ -134,10 +134,10 @@
     },
     "Testimonials": {
       "title": "What our users say",
-      "description": "Discover how 1MIN2MEET has transformed meeting planning for professionals across industries",
+      "description": "Discover how SCHEDOU has transformed meeting planning for professionals across industries",
       "testimonials": {
         "quote1": {
-          "quote": "1MIN2MEET has revolutionized how we schedule team meetings. It's so quick and efficient!",
+          "quote": "SCHEDOU has revolutionized how we schedule team meetings. It's so quick and efficient!",
           "author": "Post MaLong",
           "role": "Frontend developer at Facebook"
         },

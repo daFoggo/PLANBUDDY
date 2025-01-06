@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   return {
-    title: locale === "vi" ? "1MIN2MEET - Lên Lịch Họp Nhanh" : "1MIN2MEET - Fast Meeting Scheduler",
+    title: locale === "vi" ? "Schedou - Lên Lịch Hẹn Nhanh Chóng" : "Schedou - Fast Meeting Scheduler",
     description:
     locale === "vi"
     ? "Lên lịch họp nhanh chóng trong 1 phút"
@@ -25,12 +25,12 @@ export async function generateMetadata({
       "appointment scheduler",
     ],
     openGraph: {
-      title: "1min2meet - Quick Online Meeting Platform",
+      title: "schedou - Quick Online Meeting Platform",
       description:
         "Connect with people through quick 1-minute meetings. An efficient way to network, interview, or meet new people online.",
       type: "website",
       locale: "en_US",
-      url: "https://1min2meet.vercel.app/",
+      url: "https://schedou.vercel.app/",
       images: "@/favicon.ico",
     },
   };

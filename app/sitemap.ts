@@ -1,7 +1,7 @@
 export default async function sitemap() {
   return [
     {
-      url: "https://1min2meet.vercel.app/",
+      url: "https://schedou.vercel.app/",
       lastModified: new Date(),
     },
   ];

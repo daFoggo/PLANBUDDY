@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "1MIN2MEET",
+    "title": "SCHEDOU",
     "description": "Lên kế hoạch gặp mặt nhanh chóng chỉ trong 1 phút...hoặc hơn"
   },
   "common": {
@@ -63,7 +63,7 @@
     "Hero": {
       "title": "Lên kế hoạch gặp mặt chỉ trong 1 phút",
       "subtitle": "Hoặc hơn... :)",
-      "description": "Mệt mỏi với các cách lên kế hoạch truyền thống? Trải nghiệm cách tổ chức kế hoạch nhanh chóng với 1MIN2MEET. ",
+      "description": "Mệt mỏi với các cách lên kế hoạch truyền thống? Trải nghiệm cách tổ chức kế hoạch nhanh chóng với SCHEDOU. ",
       "GetStarted": {
         "button": {
           "text": "Bắt đầu trải nghiệm"
@@ -72,7 +72,7 @@
     },
     "Features": {
       "title": "Các tính năng chính",
-      "description": "Khám phá cách 1MIN2MEET thay đổi trải nghiệm lập kế hoạch gặp mặt của bạn với những tính năng dưới đây.",
+      "description": "Khám phá cách SCHEDOU thay đổi trải nghiệm lập kế hoạch gặp mặt của bạn với những tính năng dưới đây.",
       "features": {
         "feature1": {
           "title": "Khởi tạo lịch hẹn dễ dàng",
@@ -102,7 +102,7 @@
     },
     "HowItWorks": {
       "title": "Cách sử dụng",
-      "description": "Làm theo các bước dưới đây để lên kế hoạch gặp mặt hiệu quả với 1MIN2MEET",
+      "description": "Làm theo các bước dưới đây để lên kế hoạch gặp mặt hiệu quả với SCHEDOU",
       "steps": {
         "step1": {
           "title": "Tạo một lịch hẹn",
@@ -124,10 +124,10 @@
     },
     "Testimonials": {
       "title": "Người dùng của chúng tôi nói gì?",
-      "description": "Khám phá những thứ mà 1MIN2MEET đã thay đổi trong cách các doanh nghiệp khác nhau lên kế hoạch gặp mặt",
+      "description": "Khám phá những thứ mà SCHEDOU đã thay đổi trong cách các doanh nghiệp khác nhau lên kế hoạch gặp mặt",
       "testimonials": {
         "quote1": {
-          "quote": "1MIN2MEET đã thay đổi hoàn toàn cách chúng tôi lên kế hoạch gặp mặt. Nó rất nhanh và hiệu quả!",
+          "quote": "SCHEDOU đã thay đổi hoàn toàn cách chúng tôi lên kế hoạch gặp mặt. Nó rất nhanh và hiệu quả!",
           "author": "Post MaLong",
           "role": "Frontend developer tại Facebook"
         },

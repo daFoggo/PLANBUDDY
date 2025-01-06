@@ -5,6 +5,6 @@ export default function robots() {
       allow: '/',
       disallow: '/private/',
     },
-    sitemap: 'https://1min2meet.vercel.app/sitemap.xml',
+    sitemap: 'https://schedou.vercel.app/sitemap.xml',
   }
 }

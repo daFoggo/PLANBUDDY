@@ -1,6 +1,6 @@
 # PROJECT STRUCTURE 
 ```
-└── 📁1min2meet
+└── 📁Schedou
     └── 📁app
         └── 📁fonts
         └── globals.css

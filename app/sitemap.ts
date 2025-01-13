@@ -1,7 +1,7 @@
 export default async function sitemap() {
   return [
     {
-      url: "https://schedou.vercel.app/",
+      url: "https://planbuddy.info/",
       lastModified: new Date(),
     },
   ];

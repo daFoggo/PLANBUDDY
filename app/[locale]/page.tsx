@@ -12,12 +12,14 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   return {
-    title: locale === "vi" ? "Schedou - Lên Lịch Hẹn Nhanh Chóng" : "Schedou - Fast Meeting Scheduler",
+    title: locale === "vi" ? "PLANBUDDY" : "PLANBUDDY",
     description:
     locale === "vi"
-    ? "Lên lịch họp nhanh chóng trong 1 phút"
+    ? "Tạo lịch hẹn nhanh chóng trong 1 phút"
     : "Fast meeting scheduler in 1 minute",
     keywords: [
+      "plan",
+      "buddy",
       "meetings",
       "quick meetings",
       "meeting scheduler",
@@ -25,12 +27,12 @@ export async function generateMetadata({
       "appointment scheduler",
     ],
     openGraph: {
-      title: "schedou - Quick Online Meeting Platform",
+      title: "PLANBUDDY - Fast meeting scheduler",
       description:
-        "Connect with people through quick 1-minute meetings. An efficient way to network, interview, or meet new people online.",
+        "Schedule meeting in 1 minute",
       type: "website",
       locale: "en_US",
-      url: "https://schedou.vercel.app/",
+      url: "https://planbuddy.info/",
       images: "@/favicon.ico",
     },
   };

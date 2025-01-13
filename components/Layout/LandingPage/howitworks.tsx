@@ -18,7 +18,7 @@ const HowItWorks = async () => {
         {steps.map((step, index) => (
           <Card
             key={index}
-            className="border-primary/20 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+            className="border-primary/20 transition-all duration-300 hover:shadow-md hover:shadow-primary/10 hover:-translate-y-1"
           >
             <CardContent className="pt-6 relative">
               <div className="absolute top-0 right-0 -mt-4 -mr-4 bg-primary text-primary-foreground rounded-full size-8 flex items-center justify-center text-2xl font-bold">

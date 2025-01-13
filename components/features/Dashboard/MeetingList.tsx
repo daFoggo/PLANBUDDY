@@ -62,7 +62,7 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
     return (
       <Card
         key={meeting.id}
-        className="w-full hover:shadow-md transition-shadow duration-300 p-4"
+        className="w-full hover:shadow-md hover:shadow-primary/10 transition-shadow duration-300 p-4"
       >
         <CardHeader className="p-0 pb-2">
           <div className="flex items-center justify-between">

@@ -24,17 +24,17 @@ export async function generateMetadata({
   return {
     title:
       locale === "vi"
-        ? "SCHEDOU - Lên Lịch Họp Nhanh Chóng"
-        : "SCHEDOU - Fast Meeting Scheduler",
+        ? "PLANBUDDY"
+        : "PLANBUDDY",
     description:
       locale === "vi"
-        ? "Lên lịch họp nhanh chóng trong 1 phút"
+        ? "Tạo lịch hẹn nhanh chóng trong 1 phút"
         : "Fast meeting scheduler in 1 minute",
     openGraph: {
-      title: "SCHEDOU",
+      title: "PLANBUDDY",
       description:
         locale === "vi"
-          ? "Lên lịch họp nhanh chóng trong 1 phút"
+          ? "Tạo lịch hẹn nhanh chóng trong 1 phút"
           : "Fast meeting scheduler in 1 minute",
       images: "@/favicon.ico",
     },

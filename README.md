@@ -1,6 +1,33 @@
-# PROJECT STRUCTURE 
+# 1.PROJECT INSTALLATION
+## 1.1. Requirements
+- NodeJS 20+ 
+- PostgreSQL 15.8.1.022
+- PostgREST 12.2.3
+
+## 1.2. Installation
+- `git clone https://github.com/daFoggo/PLANBUDDY.git`
+- `cd PLANBUDDY`
+- `npm install`
+- Set up environment:
++ **.env**:
 ```
-└── 📁Schedou
+DATABASE_URL=
+# Direct connection to the database. Used for migrations.
+DIRECT_URL=
+NEXT_PUBLIC_SITE_URL=
+```
++ **.env.local**:
+```
+AUTH_SECRET=
+AUTH_GOOGLE_ID=
+AUTH_GOOGLE_SECRET=
+```
+- Run migrations: `npx prisma migrate dev`
+- Run project: `npm run dev`
+
+# 2.PROJECT STRUCTURE 
+```
+└── 📁PlanBuddy
     └── 📁app
         └── 📁fonts
         └── globals.css
@@ -41,6 +68,7 @@
             ...
     └── 📁public // public assets
         └── 📁icons
+        └── 📁logos
     └── 📁types // typescript interfaces
     ...
 ```

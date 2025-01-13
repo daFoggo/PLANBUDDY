@@ -11,10 +11,10 @@ import { Metadata } from "next/types";
 import { TABLIST } from "./constant";
 
 export const metadata: Metadata = {
-  title: 'Dashboard | schedou',
+  title: 'Dashboard | PLANBUDDY',
   description: 'Manage your meetings and schedules',
   openGraph: {
-    title: 'Dashboard | schedou',
+    title: 'Dashboard | PLANBUDDY',
     description: 'Manage your meetings and schedules',
   }
 }

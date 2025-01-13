@@ -12,7 +12,7 @@ const Footer = async () => {
       <div className="flex flex-col md:flex-row md:justify-between gap-4 md:items-end">
         {/* Left Section - Github */}
         <div className="flex flex-col gap-4 items-center md:items-start">
-          <Link href="https://github.com/daFoggo/Schedou.git">
+          <Link href="https://github.com/daFoggo/planbuddy.git">
             <Button size="sm" className="w-full md:w-auto">
               <IoLogoGithub className="size-4" />
               Github

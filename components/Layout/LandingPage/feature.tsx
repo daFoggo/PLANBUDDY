@@ -23,7 +23,7 @@ const Features = async () => {
         {features.map((feature, index) => (
           <Card
             key={index}
-            className="transition-all duration-300 ease-in-out transform hover:shadow-md hover:-translate-y-2"
+            className="transition-all duration-300 ease-in-out transform hover:shadow-md  hover:-translate-y-2 hover:shadow-primary/10"
           >
             <CardHeader>
               <div className="flex items-center justify-between mb-4">

@@ -1,9 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
-import { IoLogoGithub } from "react-icons/io";
-import Link from "next/link";
-import ContactForm from "./contact-form";
 import { getTranslations } from "next-intl/server";
+import ContactForm from "./contact-form";
 
 const Footer = async () => {
   const t = await getTranslations("Footer");

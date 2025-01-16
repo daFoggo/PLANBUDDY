@@ -5,7 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const GetStarted = () => {
@@ -18,9 +18,11 @@ const GetStarted = () => {
     <div>
       <Button
         onClick={() => {
-          status == "authenticated"
-            ? router.push('/dashboard')
-            : setIsDialogOpen(true);
+          if (status === "authenticated") {
+            router.push("/dashboard");
+          } else {
+            setIsDialogOpen(true);
+          }
         }}
       >
         {t("text")}

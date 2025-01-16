@@ -19,7 +19,7 @@ import { Loader2 } from "lucide-react";
 
 import { IGuestLoginFormProps } from "@/types/guest-login-form";
 import { useTranslations } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { formSchema } from "./constant";
 
 type FormValues = z.infer<typeof formSchema>;
@@ -30,7 +30,6 @@ const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

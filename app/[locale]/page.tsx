@@ -1,9 +1,9 @@
-import { auth } from "@/auth";
 import Features from "@/components/Layout/LandingPage/feature";
 import Hero from "@/components/Layout/LandingPage/hero";
 import HowItWorks from "@/components/Layout/LandingPage/howitworks";
 import Testimonials from "@/components/Layout/LandingPage/testimonials";
 import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { Metadata } from "next/types";
 
 export async function generateMetadata({
@@ -11,12 +11,18 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
+  const session = await auth();
+
+  if (session?.user?.id) {
+    redirect("/dashboard");
+  }
+
   return {
     title: locale === "vi" ? "PLANBUDDY" : "PLANBUDDY",
     description:
-    locale === "vi"
-    ? "Tạo lịch hẹn nhanh chóng trong 1 phút"
-    : "Fast meeting scheduler in 1 minute",
+      locale === "vi"
+        ? "Tạo lịch hẹn nhanh chóng trong 1 phút"
+        : "Fast meeting scheduler in 1 minute",
     keywords: [
       "plan",
       "buddy",
@@ -28,8 +34,7 @@ export async function generateMetadata({
     ],
     openGraph: {
       title: "PLANBUDDY - Fast meeting scheduler",
-      description:
-        "Schedule meeting in 1 minute",
+      description: "Schedule meeting in 1 minute",
       type: "website",
       locale: "en_US",
       url: "https://planbuddy.info/",
@@ -39,12 +44,6 @@ export async function generateMetadata({
 }
 
 const Home = async () => {
-  const session = await auth();
-
-  if (session) {
-    redirect("/dashboard");
-  }
-
   return (
     <main>
       <Hero />

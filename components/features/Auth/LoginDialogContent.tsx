@@ -7,9 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { FaGoogle } from "react-icons/fa";
 import GuestLoginForm from "./GuestLoginForm";
-import { useTranslations } from "next-intl";
 
 const LoginDialogContent = ({
   setIsDialogOpen,
@@ -38,7 +38,9 @@ const LoginDialogContent = ({
         </div>
 
         <Button
-          onClick={() => signIn("google")}
+          onClick={() => {
+            signIn("google");
+          }}
           className="w-full"
           variant="outline"
         >

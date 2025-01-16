@@ -55,9 +55,7 @@ const GuestLoginForm = ({ onClose }: IGuestLoginFormProps) => {
         });
       } else if (result?.ok) {
         onClose();
-        if (pathname === "/") {
-          router.push("/dashboard");
-        }
+        router.push("/dashboard");
       }
     } catch (error) {
       form.setError("root", {

@@ -1,20 +1,26 @@
 "use client";
-import { useTranslations } from "next-intl";
 import LoginDialogContent from "@/components/features/Auth/LoginDialogContent";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useRouter } from 'next/navigation';
 import { useState } from "react";
 
 const GetStarted = () => {
-  const t = useTranslations('Landing.Hero.GetStarted.button');
+  const router = useRouter();
+  const { status } = useAuth();
+
+  const t = useTranslations("Landing.Hero.GetStarted.button");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   return (
     <div>
       <Button
         onClick={() => {
-          setIsDialogOpen(true);
-          console.log("Get Started button clicked");
+          status == "authenticated"
+            ? router.push('/dashboard')
+            : setIsDialogOpen(true);
         }}
       >
         {t("text")}

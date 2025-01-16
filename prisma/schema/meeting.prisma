@@ -41,7 +41,7 @@ model AvailableSlot {
   status    SlotStatus @default(UNAVAILABLE)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  timeZone  String
+  timeZone  String?
   meeting   Meeting    @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 

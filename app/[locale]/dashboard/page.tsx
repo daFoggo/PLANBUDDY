@@ -7,25 +7,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import PageTitle from "@/components/common/PageTitle";
 import { LayoutDashboard } from "lucide-react";
+import { redirect } from "next/navigation";
 import { Metadata } from "next/types";
 import { TABLIST } from "./constant";
 
 export const metadata: Metadata = {
-  title: 'Dashboard | PLANBUDDY',
-  description: 'Manage your meetings and schedules',
+  title: "Dashboard | PLANBUDDY",
+  description: "Manage your meetings and schedules",
   openGraph: {
-    title: 'Dashboard | PLANBUDDY',
-    description: 'Manage your meetings and schedules',
-  }
-}
+    title: "Dashboard | PLANBUDDY",
+    description: "Manage your meetings and schedules",
+  },
+};
 
 const Dashboard = async () => {
   const session = await auth();
-  
+
   if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+    redirect("/");
   }
-  
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_SITE_URL}/api/meeting?userId=${session.user.id}`,
     {
@@ -35,13 +36,13 @@ const Dashboard = async () => {
       cache: "no-store",
     }
   );
-  
+
   if (!response.ok) {
     throw new Error("Failed to fetch dashboard data");
   }
-  
+
   const meetingData = await response.json();
-  
+
   return (
     <div className="flex flex-col gap-6">
       <PageTitle name="Dashboard" icon={<LayoutDashboard />} />

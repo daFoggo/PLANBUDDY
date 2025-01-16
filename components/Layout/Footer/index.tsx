@@ -9,19 +9,10 @@ const Footer = async () => {
   const t = await getTranslations("Footer");
   return (
     <footer className="border-t bg-muted p-4">
-      <div className="flex flex-col md:flex-row md:justify-between gap-4 md:items-end">
-        {/* Left Section - Github */}
-        <div className="flex flex-col gap-4 items-center md:items-start">
-          <Link href="https://github.com/daFoggo/planbuddy.git">
-            <Button size="sm" className="w-full md:w-auto">
-              <IoLogoGithub className="size-4" />
-              Github
-            </Button>
-          </Link>
-          <p className="text-xs text-muted-foreground text-center md:text-left">
-            &copy;  {t("copyright")}
-          </p>
-        </div>
+      <div className="flex flex-col md:flex-row md:justify-between gap-4 md:items-start">
+        <p className="text-xs text-muted-foreground text-center md:text-left">
+          &copy; {t("copyright")}
+        </p>
 
         {/* Right Section - Contact Form */}
         <div className="flex flex-col gap-2 w-full md:w-auto max-w-md">
@@ -31,7 +22,7 @@ const Footer = async () => {
           <ContactForm />
           <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center md:justify-start">
             <Mail className="size-4" />
-            <span className="break-all">ntgiang141105@gmail.com</span>
+            <span className="break-all">contact@planbuddy.info</span>
           </div>
         </div>
       </div>

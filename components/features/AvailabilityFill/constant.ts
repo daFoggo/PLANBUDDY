@@ -1,7 +1,7 @@
 export const meetingParticipants = [
   {
     id: "1",
-    email: "ntgiang141105@gmail.com",
+    email: "contact@planbuddy.info",
     name: "Giang Nguyen",
     image: "https://randomuser.me/api/portraits",
     timeZone: "Asia/Saigon",

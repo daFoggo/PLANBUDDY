@@ -22,7 +22,7 @@ const ContactForm = () => {
   });
 
   const onSubmit = (data: { email: string }) => {
-    window.location.href = `mailto:ntgiang141105@gmail.com?subject=Contact from Website&body=${data.email}`;
+    window.location.href = `mailto:contact@planbuddy.info?subject=Contact from Website&body=${data.email}`;
   };
 
   return (

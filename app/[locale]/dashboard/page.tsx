@@ -38,7 +38,7 @@ const Dashboard = async () => {
   );
 
   if (!response.ok) {
-    return <h1 className="font-bold"> Failed to fetch data. Please singout and try again</h1>;
+    return <h1 className="font-bold"> Failed to fetch data. Please sign out and try again</h1>;
   }
 
   const meetingData = await response.json();

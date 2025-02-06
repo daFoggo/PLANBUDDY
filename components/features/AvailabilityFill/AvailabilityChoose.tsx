@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { IMeeting } from "@/types/dashboard";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,6 +15,7 @@ interface AvailabilityChooseProps {
 }
 
 const AvailabilityChoose = ({ meeting, isOwner }: AvailabilityChooseProps) => {
+  const t = useTranslations("Availability.AvailabilityChoose");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -25,11 +27,11 @@ const AvailabilityChoose = ({ meeting, isOwner }: AvailabilityChooseProps) => {
         { method: "PATCH" }
       );
       if (response.ok) {
-        toast.success("Meeting locked successfully");
+        toast.success(t("toast.lock.success"));
         router.refresh();
       }
     } catch (error) {
-      toast.error("Error locking meeting");
+      toast.error(t("toast.lock.error"));
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -44,11 +46,11 @@ const AvailabilityChoose = ({ meeting, isOwner }: AvailabilityChooseProps) => {
         { method: "PATCH" }
       );
       if (response.ok) {
-        toast.success("Meeting unlocked successfully");
+        toast.success(t("toast.unlock.success"));
         router.refresh();
       }
     } catch (error) {
-      toast.error("Error unlocking meeting"); // Added error toast
+      toast.error(t("toast.unlock.error"));
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -73,10 +75,10 @@ const AvailabilityChoose = ({ meeting, isOwner }: AvailabilityChooseProps) => {
               disabled={isLoading}
             >
               {isLoading
-                ? "Processing..."
+                ? t("button.processing")
                 : meeting.isLocked
-                ? "Unlock Meeting"
-                : "Lock Meeting"}
+                ? t("button.unlock")
+                : t("button.lock")}
             </Button>
           </div>
         )}

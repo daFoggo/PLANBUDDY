@@ -1,7 +1,14 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { ArrowUpRight, Calendar, Clock, MapPin, Users, Video } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  Video,
+} from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -28,10 +35,14 @@ import { MEETING_TYPE } from "@/components/utils/constant";
 import {
   formatMeetingDateTime,
   getStatusColor,
+  localeMapping,
 } from "@/components/utils/helper/meeting-list";
 import { IMeeting, IMeetingListProps } from "@/types/dashboard";
+import { useLocale, useTranslations } from "next-intl";
 
 const MeetingList = ({ meetingListData }: IMeetingListProps) => {
+  const t = useTranslations("Dashboard.MeetingList");
+  const locale = useLocale();
   const [currentView, setCurrentView] = useState<"list" | "grid">("list");
 
   const sortedMeetings = useMemo(() => {
@@ -57,7 +68,10 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
   }, [sortedMeetings]);
 
   const renderMeetingCard = (meeting: IMeeting) => {
-    const { date, time } = formatMeetingDateTime(meeting);
+    const { date, time } = formatMeetingDateTime(
+      meeting,
+      localeMapping[locale] || "en-US"
+    );
 
     return (
       <Card
@@ -76,7 +90,11 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 sm:h-10 sm:w-10"
+                  >
                     {meeting?.meetingType === MEETING_TYPE.ONLINE ? (
                       <Video className="size-4 sm:size-5" />
                     ) : (
@@ -86,8 +104,8 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
                 </TooltipTrigger>
                 <TooltipContent align="center" className="text-xs sm:text-sm">
                   {meeting?.meetingType === MEETING_TYPE.INPERSON
-                    ? "Online Meeting"
-                    : "In-person Meeting"}
+                    ? t("MeetingCard.tooltip.online")
+                    : t("MeetingCard.tooltip.inperson")}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -95,7 +113,9 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
           <CardTitle className="text-base sm:text-lg font-bold truncate line-clamp-1">
             {meeting.title}
           </CardTitle>
-          <CardDescription className="text-xs sm:text-sm line-clamp-2">{meeting.description}</CardDescription>
+          <CardDescription className="text-xs sm:text-sm line-clamp-2">
+            {meeting.description}
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0 pb-2"></CardContent>
         <CardFooter className="p-0">
@@ -129,14 +149,20 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
                 </div>
               </div>
 
-              <Separator orientation="vertical" className="h-4 hidden sm:block" />
+              <Separator
+                orientation="vertical"
+                className="h-4 hidden sm:block"
+              />
 
               <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground font-semibold">
                 <Calendar className="size-3 sm:size-4 text-foreground" />
                 <span>{date}</span>
               </div>
 
-              <Separator orientation="vertical" className="h-4 hidden sm:block" />
+              <Separator
+                orientation="vertical"
+                className="h-4 hidden sm:block"
+              />
 
               <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground font-semibold">
                 <Clock className="size-3 sm:size-4 text-foreground" />
@@ -148,7 +174,7 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
                 variant="outline"
                 className="w-full sm:w-auto text-xs sm:text-sm"
               >
-                View Details
+                {t("MeetingCard.button")}
                 <ArrowUpRight className="size-3 sm:size-4" />
               </Button>
             </Link>
@@ -165,13 +191,13 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
       </div>
       {sortedMeetings.length === 0 ? (
         <div className="text-center text-base sm:text-lg font-semibold text-muted-foreground">
-          No meetings found. Create or join a meeting to get started :)
+          {t("noMeetings")}
         </div>
       ) : (
         Object.entries(groupedMeetings).map(([date, meetings]) => (
           <div key={date} className="space-y-2">
             <h1 className="text-base sm:text-lg font-semibold sticky top-0 bg-background z-10 py-2">
-              Created at {format(parseISO(date), "MMMM d, yyyy")}
+              {t("createdAt")} {format(parseISO(date), "MMMM d, yyyy")}
             </h1>
             <div
               className={`grid gap-4 ${
@@ -190,4 +216,3 @@ const MeetingList = ({ meetingListData }: IMeetingListProps) => {
 };
 
 export default MeetingList;
-

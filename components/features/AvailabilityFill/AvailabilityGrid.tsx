@@ -1,5 +1,4 @@
 "use client";
-import { useCallback } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,8 +44,9 @@ import {
   SquarePlus,
   Terminal,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import AddGoogleCalendar from "../AddGoogleCalendar";
 import LoginDialogContent from "../Auth/LoginDialogContent";
@@ -57,6 +57,7 @@ const AvailabilityGrid = ({
   meeting: IMeeting;
   isOwner: boolean;
 }) => {
+  const t = useTranslations("Availability.AvailabilityGrid");
   const router = useRouter();
   const { status, session } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -95,13 +96,18 @@ const AvailabilityGrid = ({
     (slots: ITimeSlot[], availableSlots: IAvailableSlot[]): ITimeSlot[] => {
       const commonSlots = [...slots];
 
-      const totalUsers = new Set(availableSlots.map((slot: { userId: string }) => slot.userId))
-        .size;
+      const totalUsers = new Set(
+        availableSlots.map((slot: { userId: string }) => slot.userId)
+      ).size;
 
       commonSlots.forEach((slot) => {
         slot.status = slot.status.map((_, dateIndex) => {
           const positiveAvailableUserCount = availableSlots.filter(
-            (s: { startTime: string; date: string | number | Date; status: string; }) =>
+            (s: {
+              startTime: string;
+              date: string | number | Date;
+              status: string;
+            }) =>
               s.startTime === slot.time &&
               format(new Date(s.date), "yyyy-MM-dd") ===
                 format(
@@ -313,10 +319,10 @@ const AvailabilityGrid = ({
         throw new Error(`Error saving availability: ${error.error}`);
       }
       router.refresh();
-      toast.success("Availability saved successfully");
+      toast.success(t("toast.save.success"));
     } catch (error) {
       console.error("Error saving availability:", error);
-      toast.error("Error saving availability. Please try again.");
+      toast.error(t("toast.save.error"));
     } finally {
       setIsSaving(false);
       setIsEditing(false);
@@ -435,7 +441,7 @@ const AvailabilityGrid = ({
       <CardHeader className="p-0 flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div className="gap-2">
           <CardTitle className="flex items-center gap-2">
-            Your availability
+            {t("card.title")}
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
@@ -449,10 +455,10 @@ const AvailabilityGrid = ({
                         router.refresh();
                       } catch (error) {
                         console.error("Error refreshing page:", error);
-                        toast.error("Error refreshing page. Please try again.");
+                        toast.error(t("toast.refresh.error"));
                       } finally {
                         setIsRefreshing(false);
-                        toast.success("Page refreshed successfully");
+                        toast.success(t("toast.refresh.success"));
                       }
                     }}
                   >
@@ -464,15 +470,13 @@ const AvailabilityGrid = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="border-primary">
-                  Refresh page
+                  {t("card.tooltip")}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </CardTitle>
           <CardDescription>
-            {meeting.participants.length > 1
-              ? "The brightest green indicates that all participants are available at that time."
-              : ""}
+            {meeting.participants.length > 1 ? t("card.description") : ""}
           </CardDescription>
         </div>
 
@@ -485,8 +489,8 @@ const AvailabilityGrid = ({
                   setIsEditing(true);
                 }}
               >
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit your availability
+                <Pencil className="mr-2 size-4" />
+                {t("card.button.edit")}
               </Button>
             ) : (
               <Button
@@ -494,8 +498,8 @@ const AvailabilityGrid = ({
                   setIsDialogOpen(true);
                 }}
               >
-                <SquarePlus className="mr-2 h-4 w-4" />
-                Add your availability
+                <SquarePlus className="mr-2 size-4" />
+                {t("card.button.add")}
               </Button>
             )
           ) : (
@@ -508,16 +512,16 @@ const AvailabilityGrid = ({
                 }}
                 className="border-red-500 text-red-500 bg-red-500/20 hover:bg-red-500/30 hover:text-red-500"
               >
-                Cancel
+                {t("card.button.cancel")}
               </Button>
               <Button onClick={handleSaveAvailability} disabled={isSaving}>
                 {isSaving ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    {t("card.button.saving")}
                   </>
                 ) : (
-                  "Submit"
+                  t("card.button.save")
                 )}
               </Button>
             </div>
@@ -532,39 +536,39 @@ const AvailabilityGrid = ({
               checked={showOnlyMatchingTime}
               onCheckedChange={setShowOnlyMatchingTime}
             />
-            <Label htmlFor="show-matching-time">Show only matching time</Label>
+            <Label htmlFor="show-matching-time">{t("card.switch")}</Label>
           </div>
         )}
         {isEditing && (
           <div className="flex justify-center items-center gap-2">
-            <p className="font-semibold shrink-0">Availability</p>
+            <p className="font-semibold shrink-0">{t("card.select.title")}</p>
             <Select
               value={selectedStatus}
               onValueChange={(value) => setSelectedStatus(value as SLOT_STATUS)}
               defaultValue={SLOT_STATUS.AVAILABLE}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select availability" />
+                <SelectValue placeholder={t("card.select.label")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>Select availability</SelectLabel>
+                  <SelectLabel>{t("card.select.label")}</SelectLabel>
                   <SelectItem value={SLOT_STATUS.AVAILABLE}>
                     <div className="flex items-center gap-2">
                       <div className="bg-green-500 w-3 h-3 rounded-full" />
-                      Available
+                      {t("card.select.items.available")}
                     </div>
                   </SelectItem>
                   <SelectItem value={SLOT_STATUS.IFNEEDED}>
                     <div className="flex items-center gap-2">
                       <div className="bg-yellow-500 w-3 h-3 rounded-full" />
-                      If needed
+                      {t("card.select.items.ifNeeded")}
                     </div>
                   </SelectItem>
                   <SelectItem value={SLOT_STATUS.UNAVAILABLE}>
                     <div className="flex items-center gap-2">
                       <div className="bg-red-500 w-3 h-3 rounded-full" />
-                      Unavailable
+                      {t("card.select.items.unavailable")}
                     </div>
                   </SelectItem>
                 </SelectGroup>
@@ -637,12 +641,11 @@ const AvailabilityGrid = ({
       </CardContent>
       <CardFooter className="p-0 flex flex-col gap-2">
         {isGgCalendarSelecting && (
-          <Alert>
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>Heads up!</AlertTitle>
+          <Alert className="bg-red-500/10 border-red-500 text-red-500">
+            <Terminal className="size-4" color="#ef4444" />
+            <AlertTitle>{t("card.alert.title")}</AlertTitle>
             <AlertDescription>
-              To add to Google Calendar, click and drag on the table to select
-              your preferred time range.
+              {t("card.alert.description")}
             </AlertDescription>
           </Alert>
         )}

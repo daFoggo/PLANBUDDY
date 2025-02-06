@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ const MeetingDelete = ({
   meetingId: string;
   isOwner: boolean;
 }) => {
+  const t = useTranslations("MeetingDelete");
   const { status } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -34,12 +36,12 @@ const MeetingDelete = ({
       });
 
       setIsLoading(false);
-      toast.success("Meeting deleted successfully");
+      toast.success(t("toast.success"));
       router.push("/dashboard/");
       router.refresh();
     } catch (error) {
       console.error("Error deleting meeting:", error);
-      toast.error("Error deleting meeting");
+      toast.error(t("toast.error"));
     }
   };
 
@@ -58,21 +60,21 @@ const MeetingDelete = ({
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="w-[95%] sm:w-[625px] rounded-lg"
         >
-          <DialogTitle>Delete confirm</DialogTitle>
+          <DialogTitle>{t("dialog.title")}</DialogTitle>
           <DialogDescription></DialogDescription>
-          <p>Are you sure you want to delete this meeting?</p>
+          <p>{t("dialog.description")}</p>
           <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:gap-0">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{t("dialog.button.cancel")}</Button>
             </DialogClose>
             <Button variant="destructive" onClick={handleDelete} type="submit">
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  {t("dialog.button.deleting")}
                 </>
               ) : (
-                "Delete"
+                t("dialog.button.delete")
               )}
             </Button>
           </DialogFooter>

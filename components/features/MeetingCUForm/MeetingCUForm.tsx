@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { enUS, vi } from "date-fns/locale";
 import { Loader2 } from "lucide-react";
 
 import {
@@ -51,8 +52,9 @@ import {
   normalizeDate,
 } from "@/components/utils/helper/meeting-cu-form";
 import { IMeetingCUForm } from "@/types/meeting-cu-form";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { formSchema, steps, timeOptions, weekDays } from "./constant";
+import { formSchema, timeOptions } from "./constant";
 
 const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   const { session } = useAuth();
@@ -61,6 +63,20 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
   const [step, setStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isAllDay, setIsAllDay] = useState(false);
+
+  const currentLocale = useLocale();
+  const dateLocale = currentLocale === "vi" ? vi : enUS;
+  const t = useTranslations("Navbar.MeetingCUDialog.MeetingCUForm");
+  const steps = [t("steps.step1"), t("steps.step2")];
+  const weekDays = [
+    t("weekDays.2"),
+    t("weekDays.3"),
+    t("weekDays.4"),
+    t("weekDays.5"),
+    t("weekDays.6"),
+    t("weekDays.7"),
+    t("weekDays.1"),
+  ];
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -129,7 +145,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
         : {
             ...values,
             availableSlots:
-            //@ts-expect-error meetingData.availableSlots might be undefined but is handled in the fallback
+              //@ts-expect-error meetingData.availableSlots might be undefined but is handled in the fallback
               meetingData?.availableSlots ||
               values.proposedDates.map((date) => ({
                 date: normalizeDate(date),
@@ -160,15 +176,13 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
         onClose();
 
         toast.success(
-          meetingData
-            ? "Meeting updated successfully"
-            : "Meeting created successfully"
+          meetingData ? t("toast.success.create") : t("toast.success.update")
         );
       }
     } catch (error) {
       console.error("Meeting creation failed:", error);
       toast.error(
-        meetingData ? "Error updating meeting" : "Error creating meeting"
+        meetingData ? t("toast.error.create") : t("toast.error.update")
       );
     } finally {
       setIsLoading(false);
@@ -194,15 +208,18 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
       </TabsList>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
-          <TabsContent value="Basic Infos" className="space-y-4 text-left">
+          <TabsContent value={t("steps.step1")} className="space-y-4 text-left">
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t("form.title.label")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter meeting title" {...field} />
+                    <Input
+                      placeholder={t("form.title.placeholder")}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -213,21 +230,23 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
               name="meetingType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Meeting Type</FormLabel>
+                  <FormLabel>{t("form.meetingType.label")}</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select meeting type" />
+                        <SelectValue
+                          placeholder={t("form.meetingType.placeholder")}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value={MEETING_TYPE.ONLINE}>
-                          Online
+                          {t("form.meetingType.select.online")}
                         </SelectItem>
                         <SelectItem value={MEETING_TYPE.INPERSON}>
-                          In-person
+                          {t("form.meetingType.select.inperson")}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -241,10 +260,10 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("form.description.label")}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Enter meeting description"
+                      placeholder={t("form.description.placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -259,15 +278,15 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
                 <FormItem>
                   <FormLabel>
                     {form.watch("meetingType") === MEETING_TYPE.ONLINE
-                      ? "Online meeting URL"
-                      : "Location"}
+                      ? t("form.location.label.online")
+                      : t("form.location.label.inperson")}
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={
                         form.watch("meetingType") === MEETING_TYPE.ONLINE
-                          ? "Enter online meeting URL"
-                          : "Enter location"
+                          ? t("form.location.placeholder.online")
+                          : t("form.location.placeholder.inperson")
                       }
                       {...field}
                     />
@@ -281,10 +300,10 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
               name="note"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note</FormLabel>
+                  <FormLabel>{t("form.note.label")}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Note something for people"
+                      placeholder={t("form.note.placeholder")}
                       {...field}
                     />
                   </FormControl>
@@ -293,13 +312,13 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
               )}
             />
           </TabsContent>
-          <TabsContent value="Date & Time" className="space-y-4 text-left">
+          <TabsContent value={t("steps.step2")} className="space-y-4 text-left">
             <FormField
               control={form.control}
               name="dateType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date type</FormLabel>
+                  <FormLabel>{t("form.dateType.label")}</FormLabel>
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -309,14 +328,18 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select date type" />
+                        <SelectValue
+                          placeholder={t("form.dateType.placeholder")}
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       <SelectItem value={DATE_TYPE.WEEKLY}>
-                        In this week
+                        {t("form.dateType.select.weekly")}
                       </SelectItem>
-                      <SelectItem value={DATE_TYPE.ANY}>Any date</SelectItem>
+                      <SelectItem value={DATE_TYPE.ANY}>
+                        {t("form.dateType.select.any")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -327,7 +350,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
               name="proposedDates"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Select Dates</FormLabel>
+                  <FormLabel>{t("form.proposeDates.label")}</FormLabel>
                   <div className="w-full">
                     {form.watch("dateType") === DATE_TYPE.WEEKLY ? (
                       <div className="grid grid-cols-7 gap-2">
@@ -403,6 +426,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
                           head_row: "",
                           row: "w-full mt-2",
                         }}
+                        locale={dateLocale}
                       />
                     )}
                   </div>
@@ -429,9 +453,9 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>All Day</FormLabel>
+                    <FormLabel>{t("form.isAllDay.label")}</FormLabel>
                     <FormDescription>
-                      This will set the time from 00:00 to 23:30
+                      {t("form.isAllDay.description")}
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -444,14 +468,16 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
                   name="startTime"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Available Start Time</FormLabel>
+                      <FormLabel>{t("form.startTime.label")}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select start time" />
+                            <SelectValue
+                              placeholder={t("form.startTime.placeholder")}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -471,14 +497,16 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
                   name="endTime"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Available End Time</FormLabel>
+                      <FormLabel>{t("form.endTime.label")}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select end time" />
+                            <SelectValue
+                              placeholder={t("form.endTime.placeholder")}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -503,17 +531,19 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
               onClick={() => setStep((prev) => Math.max(0, prev - 1))}
               disabled={step === 0}
             >
-              Previous
+              {t("form.button.previous")}
             </Button>
             {step === steps.length - 1 ? (
               <Button type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {meetingData ? "Updating" : "Creating"} Meeting
+                    {meetingData
+                      ? t("form.button.update")
+                      : t("form.button.create")}
                   </>
                 ) : (
-                  "Submit"
+                  t("form.button.submit")
                 )}
               </Button>
             ) : (
@@ -524,7 +554,7 @@ const MeetingCUForm = ({ onClose, meetingData }: IMeetingCUForm) => {
                   setStep((prev) => prev + 1);
                 }}
               >
-                Next
+                {t("form.button.next")}
               </Button>
             )}
           </div>

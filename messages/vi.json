@@ -36,6 +36,21 @@
         },
         "or": "Hoặc",
         "continueWithGoogle": "Tiếp tục với Google"
+      },
+      "UserMenu": {
+        "dropdown": {
+          "trigger": {
+            "avatar": {
+              "alt": "Ảnh đại diện người dùng"
+            }
+          },
+          "content": {
+            "items": {
+              "settings": "Cài đặt",
+              "logout": "Đăng xuất"
+            }
+          }
+        }
       }
     },
     "MeetingCUDialog": {
@@ -43,6 +58,105 @@
         "text": {
           "create": "Tạo lịch hẹn",
           "edit": "Chỉnh sửa lịch hẹn"
+        }
+      },
+      "dialog": {
+        "title": {
+          "create": "Tạo lịch hẹn",
+          "edit": "Chỉnh sửa lịch hẹn"
+        },
+        "description": {
+          "create": "Khởi tạo lịch hẹn mới nhanh chóng!",
+          "edit": "Chỉnh sửa thông tin lịch hẹn"
+        }
+      },
+      "MeetingCUForm": {
+        "steps": {
+          "step1": "Thông tin cơ bản",
+          "step2": "Ngày & Giờ"
+        },
+        "weekDays": {
+          "1": "CN",
+          "2": "Thứ 2",
+          "3": "Thứ 3",
+          "4": "Thứ 4",
+          "5": "Thứ 5",
+          "6": "Thứ 6",
+          "7": "Thứ 7"
+        },
+        "form": {
+          "title": {
+            "label": "Tiêu đề",
+            "placeholder": "Nhập tiêu đề lịch hẹn"
+          },
+          "meetingType": {
+            "label": "Loại lịch hẹn",
+            "placeholder": "Chọn loại lịch hẹn",
+            "select": {
+              "placeholder": "Chọn loại lịch hẹn",
+              "online": "Trực tuyến",
+              "inperson": "Trực tiếp"
+            }
+          },
+          "description": {
+            "label": "Mô tả",
+            "placeholder": "Nhập mô tả lịch hẹn"
+          },
+          "location": {
+            "label": {
+              "online": "URL cuộc họp",
+              "inperson": "Địa điểm"
+            },
+            "placeholder": {
+              "online": "Nhập URL cuộc họp",
+              "inperson": "Nhập địa điểm"
+            }
+          },
+          "note": {
+            "label": "Ghi chú",
+            "placeholder": "Để lại ghi chú cho mọi người"
+          },
+          "dateType": {
+            "label": "Kiểu lịch",
+            "placeholder": "Chọn kiểu lịch",
+            "select": {
+              "placeholder": "Chọn Kiểu lịch",
+              "weekly": "Trong tuần này",
+              "any": "Bất kì"
+            }
+          },
+          "proposeDates": {
+            "label": "Các ngày đề xuất"
+          },
+          "isAllDay": {
+            "label": "Cả ngày",
+            "description": "Thời gian đề xuất sẽ kéo dài cả ngày"
+          },
+          "startTime": {
+            "label": "Thời gian bắt đầu trong ngày",
+            "placeholder": "Đề xuất thời gian bắt đầu trong ngày"
+          },
+          "endTime": {
+            "label": "Thời gian kết thúc trong ngày",
+            "placeholder": "Đề xuất thời gian kết thúc trong ngày"
+          },
+          "button": {
+            "previous": "Quay lại",
+            "next": "Tiếp theo",
+            "submit": "Xác nhận",
+            "update": "Cập nhật lịch hẹn",
+            "create": "Khởi tạo lịch hẹn"
+          }
+        },
+        "toast": {
+          "success": {
+            "create": "Lịch hẹn đã được khởi tạo thành công!",
+            "update": "Lịch hẹn đã được cập nhật thành công!"
+          },
+          "error": {
+            "create": "Có lỗi xảy ra khi khởi tạo lịch hẹn. Vui lòng thử lại sau!",
+            "update": "Có lỗi xảy ra khi cập nhật lịch hẹn. Vui lòng thử lại sau!"
+          }
         }
       }
     }
@@ -135,6 +249,139 @@
           "quote": "Việc tích hợp Google Calendar thực sự là một điểm nhấn. Tôi không cần phải lo lắng về việc quên lịch hẹn nữa.",
           "author": "Isaac Leviethanh",
           "role": "Unity developer tại Kuro games"
+        }
+      }
+    }
+  },
+  "MeetingCopy": {
+    "toast": {
+      "success": "Đã sao chép link lịch hẹn",
+      "error": "Có lỗi xảy ra khi sao chép link lịch hẹn. Vui lòng thử lại sau!"
+    },
+    "tooltip": "Sao chép link lịch hẹn"
+  },
+  "MeetingDelete": {
+    "toast": {
+      "success": "Lịch hẹn đã được xóa thành công",
+      "error": "Có lỗi xảy ra khi xóa lịch hẹn. Vui lòng thử lại sau!"
+    },
+    "dialog": {
+      "title": "Xác nhận xóa",
+      "description": "Bạn có chắc chắn muốn xóa lịch hẹn này không?",
+      "button": {
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "deleting": "Đang xóa..."
+      }
+    }
+  },
+  "MeetingQRGen": {
+    "toast": {
+      "error": "Có lỗi xảy ra khi tạo mã QR. Vui lòng thử lại sau!"
+    },
+    "dialog": {
+      "title": "Mã QR lịch hẹn",
+      "description": "Chia sẻ tới mọi người để tham gia lịch hẹn",
+      "button": "Tải xuống mã QR"
+    }
+  },
+  "AddGoogleCalendar": {
+    "toast": {
+      "selectionNotValid": "Vui lòng chọn một khoảng thời gian trước",
+      "success": "Đang mở Google Calendar",
+      "error": "Có lỗi xảy ra khi mở Google Calendar. Vui lòng thử lại sau!"
+    },
+    "button": {
+      "add": "Thêm vào Google Calendar",
+      "cancel": "Hủy",
+      "schedule": "Thêm lịch",
+      "scheduling": "Đang thêm lịch..."
+    }
+  },
+  "Dashboard": {
+    "Overview": {
+      "arranging": {
+        "title": "Đang sắp xếp",
+        "description": "lịch hẹn đã được công khai và đang được sắp xếp"
+      },
+      "scheduled": {
+        "title": "Đã chốt",
+        "description": "lịch hẹn đã được chốt thời gian và chờ tới hẹn"
+      },
+      "hosted": {
+        "title": "Đã tổ chức",
+        "description": "lịch hẹn đã được tạo bởi bạn"
+      },
+      "joined": {
+        "title": "Đã tham gia",
+        "description": "lịch hẹn bạn đã tham gia"
+      }
+    },
+    "MeetingList": {
+      "MeetingCard": {
+        "tooltip": {
+          "online": "Lịch hẹn trực tuyến",
+          "inperson": "Lịch hẹn trực tiếp"
+        },
+        "button": "Xem Chi Tiết"
+      },
+      "noMeetings": "Không tìm thấy lịch hẹn nào. Hãy tạo hoặc tham gia lịch hẹn để bắt đầu :)",
+      "createdAt": "Đã tạo lúc"
+    }
+  },
+  "Availability": {
+    "AvailabilityChoose": {
+      "toast": {
+        "lock": {
+          "success": "Lịch hẹn đã được khóa thành công",
+          "error": "Có lỗi xảy ra khi khóa lịch hẹn"
+        },
+        "unlock": {
+          "success": "Lịch hẹn đã được mở khóa thành công",
+          "error": "Có lỗi xảy ra khi mở khóa lịch hẹn"
+        }
+      },
+      "button": {
+        "processing": "Đang xử lí...",
+        "lock": "Khóa lịch hẹn",
+        "unlock": "Mở khóa lịch hẹn"
+      }
+    },
+    "AvailabilityGrid": {
+      "toast": {
+        "save": {
+          "success": "Thời gian có mặt đã được lưu thành công",
+          "error": "Có lỗi xảy ra khi lưu thời gian có mặt. Vui lòng thử lại sau."
+        },
+        "refresh": {
+          "success": "Trang đã được làm mới thành công",
+          "error": "Có lỗi xảy ra khi làm mới trang. Vui lòng thử lại sau."
+        }
+      },
+      "card": {
+        "title": "Thời gian có mặt của lịch hẹn",
+        "tooltip": "Làm mới trang",
+        "description": "Phần màu xanh đậm nhất đại diện cho khoảng thời gian tất cả thành viên đều có thể có mặt",
+        "button": {
+          "edit": "Chỉnh sửa thời gian có mặt",
+          "add": "Thêm thời gian có mặt",
+          "cancel": "Hủy",
+          "save": "Lưu",
+          "saving": "Đang lưu..."
+        },
+        "switch": "Chỉ hiển thị thời gian khớp với nhau",
+        "select": {
+          "title": "Khả năng",
+          "label": "Chọn loại khả năng",
+          "items": {
+            "available": "Có mặt",
+            "ifNeeded": "Nếu cần thiết",
+            "unavailable": "Không có mặt"
+          }
+        },
+        "alert": {
+          "title": "Chú ý !",
+          "description": "Để thêm lịch vào Google Calendar, nhấn vào kéo giữ trên bảng để chọn khoảng thời gian bạn mong muốn."
         }
       }
     }

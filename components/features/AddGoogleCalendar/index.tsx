@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { IAddGoogleCalendarProps } from "@/types/add-google-calendar";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { SiGooglecalendar } from "react-icons/si";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ const AddGoogleCalendar = ({
   selection,
   isSelectionValid,
 }: IAddGoogleCalendarProps) => {
+  const t = useTranslations("AddGoogleCalendar");
   const [isSelecting, setIsSelecting] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
 
@@ -30,7 +32,7 @@ const AddGoogleCalendar = ({
 
   const handleScheduleToGoogle = async () => {
     if (!isSelectionValid) {
-      toast.error("Please select a time slot first");
+      toast.error(t("toast.selectionNotValid"));
       return;
     }
 
@@ -70,11 +72,11 @@ const AddGoogleCalendar = ({
 
       window.open(googleCalendarUrl, "_blank");
 
-      toast.success("Opening Google Calendar");
+      toast.success(t("toast.success"));
       handleCancelSelection();
     } catch (error) {
       console.error("Error scheduling to Google Calendar:", error);
-      toast.error("Failed to schedule to Google Calendar");
+      toast.error(t("toast.error"));
     } finally {
       setIsScheduling(false);
     }
@@ -87,7 +89,7 @@ const AddGoogleCalendar = ({
         className="border-primary text-primary bg-primary/20 hover:text-primary hover:bg-primary/30"
         onClick={handleStartSelection}
       >
-        Add to Google Calendar
+        {t("button.add")}
         <SiGooglecalendar className="ml-2 size-4" />
       </Button>
     );
@@ -100,7 +102,7 @@ const AddGoogleCalendar = ({
         className="border-red-500 text-red-500 bg-red-500/20 hover:bg-red-500/30 hover:text-red-500"
         onClick={handleCancelSelection}
       >
-        Cancel
+        {t("button.cancel")}
       </Button>
       <Button
         onClick={handleScheduleToGoogle}
@@ -109,11 +111,11 @@ const AddGoogleCalendar = ({
         {isScheduling ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Scheduling...
+            {t("button.scheduling")}
           </>
         ) : (
           <>
-            Schedule
+            {t("button.schedule")}
             <SiGooglecalendar className="ml-2 size-4" />
           </>
         )}

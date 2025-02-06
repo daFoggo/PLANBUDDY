@@ -7,10 +7,6 @@ export const timeOptions = Array.from({ length: 48 }, (_, i) => {
   return `${hour.toString().padStart(2, "0")}:${minute}`;
 });
 
-export const steps = ["Basic Infos", "Date & Time"];
-
-export const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
 export const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
@@ -20,20 +16,26 @@ export const formSchema = z.object({
 
   dateType: z.enum([DATE_TYPE.WEEKLY, DATE_TYPE.ANY]),
   proposedDates: z.array(z.date()).min(1, "At least one date is required"),
-  participants: z.array(
-    z.object({
-      userId: z.string(),
-      role: z.string(),
-      responseStatus: z.string(),
-      timeZone: z.string().optional(),
-    })
-  ).min(1, { message: "At least one participant is required" }),
-  availableSlots: z.array(z.object({
-    date: z.date(),
-    startTime: z.string(),
-    endTime: z.string(),
-    timeZone: z.string()
-  })).optional(),
+  participants: z
+    .array(
+      z.object({
+        userId: z.string(),
+        role: z.string(),
+        responseStatus: z.string(),
+        timeZone: z.string().optional(),
+      })
+    )
+    .min(1, { message: "At least one participant is required" }),
+  availableSlots: z
+    .array(
+      z.object({
+        date: z.date(),
+        startTime: z.string(),
+        endTime: z.string(),
+        timeZone: z.string(),
+      })
+    )
+    .optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
   isAllDay: z.boolean().optional().default(false),

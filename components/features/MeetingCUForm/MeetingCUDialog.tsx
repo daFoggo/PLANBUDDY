@@ -14,12 +14,14 @@ import MeetingCUForm from "./MeetingCUForm";
 
 import { useAuth } from "@/hooks/use-auth";
 import { IMeetingCUDialogProps } from "@/types/meeting-cu-dialog";
+import { useTranslations } from "next-intl";
 
 const MeetingCUDialog = ({
   manageType,
   meetingData,
   isOwner,
 }: IMeetingCUDialogProps) => {
+  const t = useTranslations("Navbar.MeetingCUDialog");
   const { status } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -28,24 +30,24 @@ const MeetingCUDialog = ({
         {manageType === "create" ? (
           <Button>
             <CalendarPlus className="size-4" />
-            Create Meeting
+            {t("button.text.create")}
           </Button>
         ) : status === "authenticated" && isOwner ? (
           <Button>
             <CalendarCog className="size-4" />
-            Edit Meeting
+            {t("button.text.edit")}
           </Button>
         ) : null}
       </DialogTrigger>
       <DialogContent className="w-[95%] sm:w-[625px] rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-xl">
-            {manageType === "create" ? "Create Meeting" : "Edit Meeting"}
+            {manageType === "create" ? t("dialog.title.create") : t("dialog.title.create")}
           </DialogTitle>
           <DialogDescription>
             {manageType === "create"
-              ? "Schedule new meeting in just one minute!"
-              : "Edit your meeting details"}
+              ? t("dialog.description.create")
+              : t("dialog.description.edit")}
           </DialogDescription>
           <MeetingCUForm
             onClose={() => setIsOpen(false)}

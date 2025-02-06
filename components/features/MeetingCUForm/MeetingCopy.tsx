@@ -9,17 +9,19 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Link } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const MeetingCopy = ({ meetingId }: { meetingId: string }) => {
+  const t = useTranslations("MeetingCopy");
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(
         `${process.env.NEXT_PUBLIC_SITE_URL}/meeting/${meetingId}`
       );
-      toast.success("Meeting link copied to clipboard");
+      toast.success(t("toast.success"));
     } catch (error) {
       console.error("Error copying meeting link:", error);
-      toast.error("Error copying meeting link");
+      toast.error(t("toast.error"));
     }
   };
 
@@ -36,7 +38,7 @@ const MeetingCopy = ({ meetingId }: { meetingId: string }) => {
           </Button>
         </TooltipTrigger>
         <TooltipContent className="border-primary">
-          <p>Copy meeting link</p>
+          <p>{t("tooltip")}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

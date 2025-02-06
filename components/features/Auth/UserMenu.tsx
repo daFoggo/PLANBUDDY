@@ -1,4 +1,4 @@
-import { signOut } from "next-auth/react";
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,12 +11,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings } from "lucide-react";
 import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 interface UserMenuProps {
   session: Session | null;
 }
 
 const UserMenu = ({ session }: UserMenuProps) => {
+  const t = useTranslations("Navbar.LoginButton.UserMenu");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,7 +27,7 @@ const UserMenu = ({ session }: UserMenuProps) => {
           <Avatar className="w-8 h-8">
             <AvatarImage
               src={session?.user?.image || undefined}
-              alt={session?.user?.name || "User avatar"}
+              alt={session?.user?.name || t("dropdown.trigger.avatar.alt")}
             />
             <AvatarFallback>
               {session?.user?.name
@@ -50,7 +53,7 @@ const UserMenu = ({ session }: UserMenuProps) => {
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <Settings className="w-4 h-4 mr-2" />
-          Settings
+          {t("dropdown.content.items.settings")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -59,7 +62,7 @@ const UserMenu = ({ session }: UserMenuProps) => {
           }}
         >
           <LogOut className="w-4 h-4 mr-2" />
-          Log out
+          {t("dropdown.content.items.logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

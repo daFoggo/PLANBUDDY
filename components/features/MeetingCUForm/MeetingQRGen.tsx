@@ -10,14 +10,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Download, QrCode } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { QRCodeCanvas } from "qrcode.react";
 import { toast } from "sonner";
 
 const MeetingQRGen = ({ meetingId }: { meetingId: string }) => {
+  const t = useTranslations("MeetingQRGen");
   const handleDownloadQR = async () => {
     const canvas = document.getElementById("qrcode") as HTMLCanvasElement;
     if (!canvas) {
-      toast.error("QR Code not found");
+      toast.error(t("toast.error"));
       return;
     }
     const pngUrl = canvas
@@ -45,9 +47,9 @@ const MeetingQRGen = ({ meetingId }: { meetingId: string }) => {
       </DialogTrigger>
       <DialogContent className="w-[95%] sm:w-[625px] rounded-lg">
         <DialogHeader>
-          <DialogTitle>Meeting QR Code</DialogTitle>
+          <DialogTitle>{t("dialog.title")}</DialogTitle>
           <DialogDescription>
-            Share this to other peoples to join the meeting
+            {t("dialog.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col justify-center items-center gap-4">
@@ -63,7 +65,7 @@ const MeetingQRGen = ({ meetingId }: { meetingId: string }) => {
             onClick={handleDownloadQR}
           >
             <Download className="size-4" />
-            Download QR Code
+            {t("dialog.button")}
           </Button>
         </div>
       </DialogContent>

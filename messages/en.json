@@ -36,6 +36,21 @@
         },
         "or": "OR",
         "continueWithGoogle": "Continue with Google"
+      },
+      "UserMenu": {
+        "dropdown": {
+          "trigger": {
+            "avatar": {
+              "alt": "User avatar"
+            }
+          },
+          "content": {
+            "items": {
+              "settings": "Settings",
+              "logout": "Logout"
+            }
+          }
+        }
       }
     },
     "MeetingCUDialog": {
@@ -53,6 +68,95 @@
         "description": {
           "create": "Schedule new meeting in just one minute!.",
           "edit": "Edit your meeting details"
+        }
+      },
+      "MeetingCUForm": {
+        "steps": {
+          "step1": "Basic Infos",
+          "step2": "Date & Time"
+        },
+        "weekDays": {
+          "1": "Sun",
+          "2": "Mon",
+          "3": "Tue",
+          "4": "Wed",
+          "5": "Thu",
+          "6": "Fri",
+          "7": "Sat"
+        },
+        "form": {
+          "title": {
+            "label": "Title",
+            "placeholder": "Enter meeting title"
+          },
+          "meetingType": {
+            "label": "Meeting type",
+            "placeholder": "Select meeting type",
+            "select": {
+              "placeholder": "Select meeting type",
+              "online": "Online",
+              "inperson": "In-person"
+            }
+          },
+          "description": {
+            "label": "Description",
+            "placeholder": "Enter meeting description"
+          },
+          "location": {
+            "label": {
+              "online": "Online Meeting URL",
+              "inperson": "Location"
+            },
+            "placeholder": {
+              "online": "Enter online meeting URL",
+              "inperson": "Enter location"
+            }
+          },
+          "note": {
+            "label": "Note",
+            "placeholder": "Leave note for people"
+          },
+          "dateType": {
+            "label": "Date type",
+            "placeholder": "Select date type",
+            "select": {
+              "placeholder": "Select date type",
+              "weekly": "In this week",
+              "any": "Any date"
+            }
+          },
+          "proposeDates": {
+            "label": "Propose Dates"
+          },
+          "isAllDay": {
+            "label": "All day",
+            "description": "Check if this is an all-day event"
+          },
+          "startTime": {
+            "label": "Start time in day",
+            "placeholder": "Propose start time in day"
+          },
+          "endTime": {
+            "label": "End time in day",
+            "placeholder": "Propose end time in day"
+          },
+          "button": {
+            "previous": "Previous",
+            "next": "Next",
+            "submit": "Submit",
+            "update": "Update meeting",
+            "create": "Create meeting"
+          }
+        },
+        "toast": {
+          "success": {
+            "create": "Meeting has been created successfully!",
+            "update": "Meeting has been updated successfully!"
+          },
+          "error": {
+            "create": "There was an error creating the meeting. Please try again later!",
+            "update": "There was an error updating the meeting. Please try again later!"
+          }
         }
       }
     }
@@ -145,6 +249,139 @@
           "quote": "The ease of use and Google Calendar integration make this tool indispensable for our organization.",
           "author": "Isaac Leviethanh",
           "role": "Unity developer at Kuro games"
+        }
+      }
+    }
+  },
+  "MeetingCopy": {
+    "toast": {
+      "success": "Meeting link copied to clipboard",
+      "error": "There was an error copying the link to clipboard. Please try again later!"
+    },
+    "tooltip": "Copy meeting link"
+  },
+  "MeetingDelete": {
+    "toast": {
+      "success": "Meeting deleted successfully",
+      "error": "Error deleting meeting. Please try again!"
+    },
+    "dialog": {
+      "title": "Delete confirm",
+      "description": "Are you sure you want to delete this meeting?",
+      "button": {
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleting": "Deleting..."
+      }
+    }
+  },
+  "MeetingQRGen": {
+    "toast": {
+      "error": "There was an error generating QR code. Please try again later!"
+    },
+    "dialog": {
+      "title": "Meeting QR Code",
+      "description": "Share this QR code with participants to fill in their available times.",
+      "button": "Download QR Code"
+    }
+  },
+  "AddGoogleCalendar": {
+    "toast": {
+      "selectionNotValid": "Please select a time slot first",
+      "success": "Opening Google Calendar",
+      "error": "Failed to schedule to Google Calendar"
+    },
+    "button": {
+      "add": "Add to Google Calendar",
+      "cancel": "Cancel",
+      "schedule": "Schedule",
+      "scheduling": "Scheduling..."
+    }
+  },
+  "Dashboard": {
+    "Overview": {
+      "arranging": {
+        "title": "Arranging",
+        "description": "meetings are published and currently being arranged"
+      },
+      "scheduled": {
+        "title": "Scheduled",
+        "description": "meetings have been scheduled and are awaiting"
+      },
+      "hosted": {
+        "title": "Hosted",
+        "description": "meetings has been hosted by you"
+      },
+      "joined": {
+        "title": "Joined",
+        "description": "meetings has been joined"
+      }
+    },
+    "MeetingList": {
+      "MeetingCard": {
+        "tooltip": {
+          "online": "Online meeting",
+          "inperson": "In-person meeting"
+        },
+        "button": "View Details"
+      },
+      "noMeetings": "No meetings found. Create or join a meeting to get started :)",
+      "createdAt": "Created at"
+    }
+  },
+  "Availability": {
+    "AvailabilityChoose": {
+      "toast": {
+        "lock": {
+          "success": "Meeting locked successfully",
+          "error": "Error locking meeting"
+        },
+        "unlock": {
+          "success": "Meeting unlocked successfully",
+          "error": "Error unlocking meeting"
+        }
+      },
+      "button": {
+        "processing": "Processing...",
+        "lock": "Lock",
+        "unlock": "Unlock"
+      }
+    },
+    "AvailabilityGrid": {
+      "toast": {
+        "save": {
+          "success": "Availability saved successfully",
+          "error": "Error saving availability"
+        },
+        "refresh": {
+          "success": "Page refreshed successfully.",
+          "error": "Error refreshing page. Please try again."
+        }
+      },
+      "card": {
+        "title": "Meeting availability",
+        "tooltip": "Refresh page",
+        "description": "The brightest green indicates that all participants are available at that time.",
+        "button": {
+          "edit": "Edit your availability",
+          "add": "Add your availability",
+          "cancel": "Cancel",
+          "save": "Save",
+          "saving": "Saving..."
+        },
+        "switch": "Show only matching time",
+        "select": {
+          "title": "Availability",
+          "label": "Select availability",
+          "items": {
+            "available": "Available",
+            "ifNeeded": "If needed",
+            "unavailable": "Unavailable"
+          }
+        },
+        "alert": {
+          "title": "Heads up!",
+          "description": "To add to Google Calendar, click and drag on the table to select your preferred time range."
         }
       }
     }

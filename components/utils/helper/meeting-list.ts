@@ -1,5 +1,6 @@
 import { IMeeting } from "@/types/dashboard";
-import { format, isThisWeek, parse } from "date-fns";
+import { format, isThisWeek, Locale, parse } from "date-fns";
+import { enUS, vi } from "date-fns/locale";
 
 export const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
@@ -14,15 +15,21 @@ export const getStatusColor = (status: string) => {
   }
 };
 
-export const formatMeetingDateTime = (meeting: IMeeting) => {
+export const formatMeetingDateTime = (
+  meeting: IMeeting,
+  locale: string = "en-US"
+) => {
   try {
     const dates = meeting.proposedDates.map((date) => new Date(date));
     const formattedDates = dates
       .map((date) => {
-        if (isThisWeek(date, { weekStartsOn: 1 })) {
-          return format(date, "EEE");
+        if (locale === "vi-VN") {
+          return formatVietnameseDate(date);
         }
-        return format(date, "MMM d");
+        if (isThisWeek(date, { weekStartsOn: 1 })) {
+          return format(date, "EEE", { locale: getLocale(locale) });
+        }
+        return format(date, "MMM d", { locale: getLocale(locale) });
       })
       .join(", ");
 
@@ -30,12 +37,35 @@ export const formatMeetingDateTime = (meeting: IMeeting) => {
     const defaultDate = new Date();
     const startTime = parse(meeting.startTime, "HH:mm", defaultDate);
     const endTime = parse(meeting.endTime, "HH:mm", defaultDate);
-    const formattedStart = format(startTime, "h:mm a");
-    const formattedEnd = format(endTime, "h:mm a");
-    if (formattedStart === "12:00 AM" && formattedEnd === "11:30 PM") {
-      formattedTime = "All Day";
+
+    const midnightStart =
+      startTime.getHours() === 0 && startTime.getMinutes() === 0;
+    const lastMinuteEnd =
+      endTime.getHours() === 23 && endTime.getMinutes() === 30;
+
+    if (midnightStart && lastMinuteEnd) {
+      formattedTime = getAllDayText(locale);
     } else {
-      formattedTime = `${formattedStart} - ${formattedEnd}`;
+      if (locale === "vi-VN") {
+        formattedTime = `${formatVietnameseTime(
+          startTime
+        )} - ${formatVietnameseTime(endTime)}`;
+      } else {
+        const timeFormatOptions: Intl.DateTimeFormatOptions = {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        };
+        const formattedStart = startTime.toLocaleTimeString(
+          locale,
+          timeFormatOptions
+        );
+        const formattedEnd = endTime.toLocaleTimeString(
+          locale,
+          timeFormatOptions
+        );
+        formattedTime = `${formattedStart} - ${formattedEnd}`;
+      }
     }
 
     return {
@@ -44,6 +74,48 @@ export const formatMeetingDateTime = (meeting: IMeeting) => {
     };
   } catch (error) {
     console.error("Error formatting meeting date/time:", error);
-    return { date: "Error", time: "Error" };
+    const errorText = getErrorText(locale);
+    return { date: errorText, time: errorText };
   }
+};
+
+const getAllDayText = (locale: string): string => {
+  const allDayTexts: { [key: string]: string } = {
+    "en-US": "All Day",
+    "vi-VN": "Cả ngày",
+  };
+  return allDayTexts[locale] || allDayTexts["en-US"];
+};
+
+const getErrorText = (locale: string): string => {
+  const errorTexts: { [key: string]: string } = {
+    "en-US": "Error",
+    "vi-VN": "Lỗi",
+  };
+  return errorTexts[locale] || errorTexts["en-US"];
+};
+
+const getLocale = (locale: string) => {
+  const locales: { [key: string]: Locale } = {
+    "en-US": enUS,
+    "vi-VN": vi,
+  };
+  return locales[locale] || enUS;
+};
+
+export const localeMapping: { [key: string]: string } = {
+  en: "en-US",
+  vi: "vi-VN",
+};
+
+const formatVietnameseDate = (date: Date): string => {
+  const day = format(date, "d");
+  const month = format(date, "LL");
+  return `Ngày ${day}/${month}`;
+};
+
+const formatVietnameseTime = (time: Date): string => {
+  const hour = format(time, "H");
+  const minute = format(time, "mm");
+  return `${hour}:${minute}`;
 };
